@@ -1,134 +1,90 @@
-# Hán Lộ — web học tiếng Trung HSK 1
+# Hán Lộ — Nền Tảng Học Tiếng Trung HSK 1–3 (React + TypeScript + Vite)
 
-Website/PWA hoàn chỉnh (HTML + CSS + JavaScript thuần, không build, không backend) để học **300 từ HSK 1 theo chuẩn HSK 3.0** dành cho người Việt: pinyin tô màu thanh điệu, âm Hán–Việt, nghĩa tiếng Việt, phát âm, ôn tập cách quãng, luyện viết bút thuận. Cài được lên màn hình chính và dùng offline.
+Ứng dụng web hiện đại xây dựng bằng **React 19**, **TypeScript**, và **Vite** để học **800 từ vựng cốt lõi HSK 1–3 theo chuẩn HSK 3.0** dành cho người Việt: Pinyin tô màu thanh điệu, âm Hán–Việt làm cầu nối tư duy, phát âm AI, ôn tập cách quãng SM-2 Spaced Repetition, cẩm nang ngữ âm, bài đọc tương tác, luyện nói AI và luyện viết chữ Hán thư pháp.
 
-## Chạy
+---
 
-**Cách 1 — mở trực tiếp:** nhấp đôi `index.html`. Chạy được ngay (tiến độ lưu trong trình duyệt), nhưng **không cài PWA/offline** vì `file://` không dùng được service worker.
+## 🚀 Cách chạy ứng dụng
 
-**Cách 2 — chạy qua HTTP (khuyến nghị):**
-
-```bat
-serve.cmd
-```
-
-hoặc:
-
+### Chế độ phát triển (Dev server)
 ```bash
-python -m http.server 8000
-# mở http://localhost:8000
+npm run dev
 ```
+Ứng dụng sẽ khởi chạy tại: `http://localhost:3000`
 
-**Cài như app:** mở bằng Chrome/Edge trên điện thoại hoặc máy tính → menu trình duyệt → *Thêm vào màn hình chính* / *Cài đặt ứng dụng*.
-
-## Có gì trong web
-
-| Trang / khu vực | Nội dung |
-|---|---|
-| `index.html` | Ứng dụng học: màn hình chào (chọn mục tiêu + số từ/ngày), Học, Từ điển, Viết, Tiến độ, Cài đặt |
-| `gioi-thieu.html` | Giới thiệu HSK 3.0 (bảng 9 cấp), mốc chuyển đổi 2026–2027, cách app dạy, nguồn tham khảo |
-| `404.html` | Trang không tìm thấy |
-| `manifest.webmanifest` + `sw.js` + `icons/` | PWA: cài lên màn hình chính, cache app, dùng offline 100% |
-| `phonics-data.js` | Hệ thống ngữ âm: 23 thanh mẫu, 36 vận mẫu, 5 thanh điệu kèm Tone Curve Visualizer SVG |
-| `grammar-data.js` | Ngữ pháp thực chiến & so sánh sắc thái (二/两, 会/能/可以, 的/得/地...) |
-| `reader-data.js` | Bài đọc phân cấp HSK tương tác, bật/tắt pinyin, tra từ tức thì (Instant Click-Lookup) |
-| `exam-data.js` | Đề thi thử HSK 1 (40 câu) & HSK 2 (60 câu) chuẩn CTI, đếm giờ & tự động chấm điểm |
-| `hsk3-data.js` | 300 từ vựng cốt lõi HSK 3 (chuẩn HSK 3.0) kèm đầy đủ pinyin, Hán–Việt và nghĩa |
-| `db.js` | Hệ thống lưu trữ Client-Side chuẩn IndexedDB API thuần (`HanLoDB`), auto-migration từ localStorage |
-| `worksheet-generator.js` | Trình tạo vở tập viết chữ Hán A4: ô Mễ, ô Điền, ô Hồi Cung, nét mờ, in/xuất PDF |
-| `pinyin-typing.js` | IME Speed Trainer: Luyện gõ Pinyin ra chữ Hán đo CPM, WPM, độ chuẩn xác & combo |
-| `pinyin-annotator.js` | Ruby Text Annotator: Tự động thêm Pinyin và âm Hán-Việt cho đoạn văn bất kỳ |
-| `hanzi-games.js` | Gamification: Ghép thành ngữ 4 chữ (成语消消乐) & Ghép bộ thủ (Radical Fusion) |
-| `speech-recognition.js` | Bộ nhận diện giọng nói Web Speech AI zh-CN & chấm điểm phát âm trực tiếp |
-| `stroke-canvas.js` | Bảng vẽ nét thư pháp HTML5 Canvas thuần kèm cẩm nang 8 quy tắc bút thuận vàng |
-| `audio-fx.js` | Web Audio Synthesizer: âm thanh phách gỗ, khánh ngọc, chuông thiền không cần file âm thanh ngoài |
-
-Tính năng học & luyện tập:
-
-- **800 từ vựng HSK 1, HSK 2 & HSK 3** (300 từ HSK 1 + 200 từ HSK 2 + 300 từ HSK 3) chuẩn đề cương HSK 3.0.
-- **Bộ chuyển cấp độ 5 chế độ**: `Số 0`, `HSK 1`, `HSK 2`, `HSK 3` hoặc `Tất cả` (800 từ).
-- **Vở tập viết A4 chuẩn in ấn**: Tùy biến ô Mễ (米字格), ô Điền (田字格), ô Hồi Cung (回宫格), nét mờ tập tô, xuất PDF/in trực tiếp.
-- **Luyện gõ Pinyin thần tốc (Pinyin Typing Master)**: Luyện gõ pinyin không dấu ra chữ Hán, đo tốc độ CPM và WPM chuẩn xác.
-- **Thêm Pinyin cho đoạn văn (Ruby Annotator)**: Dán văn bản tiếng Trung, tự động gán Pinyin & Hán-Việt trên đầu, tra cứu tức thì.
-- **Trò chơi chữ Hán (Gamification)**: Ghép thành ngữ 4 chữ (成语消消乐) kèm điển tích văn hóa & ghép bộ thủ tạo chữ.
-- **Luyện nói & Chấm phát âm (Speaking Master)**: Web Speech AI chấm điểm phát âm tiếng Trung theo % chuẩn xác, phản hồi tức thì bằng âm thanh khánh ngọc / phách gỗ.
-- **Bảng vẽ nét thư pháp độc lập (Virtual Stroke Canvas)**: Luyện viết trên lưới Mễ (米) với mực bút lông biến thiên độ dày theo tốc độ di bút, chữ mẫu chìm và cẩm nang 8 quy tắc bút thuận vàng.
-- **Luyện đọc tương tác (HSK Reader)**: Ẩn/hiện pinyin, nhấp vào từ bất kỳ để mở popup tra cứu tức thì mà không cần chuyển trang.
-- **Thi thử HSK 1 & HSK 2 Mock Exam**: 
-  - HSK 1: 40 câu / 35 phút (Nghe 20 + Đọc 20).
-  - HSK 2: 60 câu / 55 phút (Nghe 35 + Đọc 25).
-  - Tự động tính điểm chuẩn thang 200 điểm (đỗ ≥ 120 điểm), lưu lịch sử thi chi tiết.
-- **Lưu trữ IndexedDB thuần (`HanLoDB`)**: Không giới hạn dung lượng, tự động chuyển đổi tiến độ cũ từ `localStorage`, lưu nhật ký luyện nói và lịch sử thi.
-- **Bản đồ hoạt động 52 tuần (Study Heatmap)**: Trực quan hóa tần suất học 365 ngày qua phong cách GitHub.
-- **Ma trận trí nhớ (Memory Matrix)**: Đo lường độ bền trí nhớ SM-2 theo 4 cấp độ (Mới học, Củng cố ngắn, Vững chắc, Trí nhớ dài hạn).
-- **Hiệu ứng âm thanh phương Đông**: Tự động tổng hợp âm phách gỗ, khánh ngọc, chuông thiền qua Web Audio API.
-- **Giao diện Imperial Jade**: Bento Grid, Dark/Light mode, linh vật rồng nhỏ thuần SVG ("Long-er") biểu cảm theo ngữ cảnh.
-
-## Cấu trúc file
-
-```
-han-lo/
-  index.html            ứng dụng chính (Bento Grid, 9 phân hệ học)
-  gioi-thieu.html       trang giới thiệu HSK 3.0
-  404.html              trang lỗi
-  styles.css            toàn bộ giao diện (sáng/tối, bento grid, thi thử, modal, heatmap)
-  data.js               500 từ HSK 1 & HSK 2: [Hán, pinyin, Hán–Việt, nghĩa]
-  hsk3-data.js          300 từ HSK 3 chuẩn HSK 3.0
-  worksheet-generator.js trình tạo vở tập viết chữ Hán A4 xuất in/PDF
-  pinyin-typing.js      bộ luyện gõ Pinyin đo CPM/WPM
-  pinyin-annotator.js   bộ bóc tách & thêm Pinyin cho văn bản tự do
-  hanzi-games.js        game ghép thành ngữ 4 chữ & ghép bộ thủ
-  db.js                 IndexedDB API thuần 6 Object Stores & auto-migration
-  speech-recognition.js Web Speech AI nhận diện giọng nói & chấm điểm zh-CN
-  stroke-canvas.js      bảng vẽ nét thư pháp & 8 quy tắc bút thuận vàng
-  phonics-data.js       dữ liệu ngữ âm, thanh mẫu, vận mẫu, tone curve SVG
-  grammar-data.js       ngữ pháp và các cặp so sánh sắc thái
-  reader-data.js        bài đọc phân cấp kèm token tra cứu
-  exam-data.js          ngân hàng đề thi thử HSK 1 (40 câu) & HSK 2 (60 câu)
-  audio-fx.js           Web Audio Synthesizer (phách gỗ, khánh ngọc, chuông thiền)
-  core.js               logic thuần: thanh điệu, lịch ôn SM-2, time utils
-  app.js                controller toàn bộ giao diện, thi thử, đọc hiểu, sao lưu/khôi phục
-  sw.js                 service worker (cache shell app, offline 100%)
-  manifest.webmanifest  khai báo PWA
-  icons/                icon PWA (192, 512, maskable, apple-touch)
-  check.cjs             bộ 34 test tự động: toàn bộ dữ liệu, thuật toán, audio-fx, PWA, IndexedDB
-  docs/                 đề án nâng cấp kiến trúc và tài liệu nghiên cứu
-  serve.cmd             chạy server tĩnh nhanh
-```
-
-## Kiểm tra
-
+### Kiểm tra cú pháp (Lint)
 ```bash
-node check.cjs
+npm run lint
 ```
 
-Chạy toàn bộ **34 bài kiểm tra tự động**:
-1. 300 từ HSK 1, 200 từ HSK 2, 300 từ HSK 3 đúng 4 trường, không trùng lặp.
-2. Pinyin hợp lệ âm tiết Latinh + dấu thanh chuẩn quốc tế.
-3. Toàn bộ file tham chiếu trong HTML, Manifest, Service Worker tồn tại.
-4. Thuật toán SM-2, toneOf, colorizePinyin.
-5. Đề thi thử HSK 1 (40 câu) & HSK 2 (60 câu) và logic chấm điểm chuẩn xác.
-6. Cú pháp và dữ liệu của `audio-fx.js`, `phonics-data.js`, `grammar-data.js`, `reader-data.js`.
-7. Module lưu trữ `db.js` (IndexedDB), nhận diện giọng nói `speech-recognition.js`, và canvas `stroke-canvas.js`.
-8. Trình tạo vở tập viết `worksheet-generator.js` (ô Mễ, Điền, Hồi Cung, vector SVG, A4 print).
-9. Luyện gõ `pinyin-typing.js` (CPM, WPM, accuracy, streak).
-10. Gán pinyin `pinyin-annotator.js` (Longest Match First, thẻ HTML5 ruby).
-11. Ngân hàng thành ngữ & game `hanzi-games.js`.
+### Build sản phẩm (Production)
+```bash
+npm run build
+```
 
-## Triển khai (deploy)
+---
 
-Đây là web tĩnh offline-first, đưa nguyên thư mục lên bất kỳ host tĩnh nào (HTTPS để service worker hoạt động):
+## 🏗️ Cấu trúc dự án mới (React SPA)
 
-- **GitHub Pages**: push thư mục, bật Pages cho nhánh `main`.
-- **Netlify/Vercel/Cloudflare Pages**: kéo–thả thư mục, không cần build command.
-- **Nginx/Apache**: trỏ document root vào thư mục này.
+```
+├── index.html                  # HTML entry point với meta tags và HanziWriter
+├── vite.config.ts              # Cấu hình Vite dev server (host: 0.0.0.0, port: 3000)
+├── tsconfig.json               # Cấu hình TypeScript nghiêm ngặt
+├── package.json                # Dependencies: React 19, Lucide, Vite
+├── styles.css                  # Toàn bộ CSS phong cách thiền họa / tuyên chỉ phương Đông
+└── src/
+    ├── main.tsx                # Entry point gắn kết React vào #root
+    ├── App.tsx                 # Quản lý trạng thái trung tâm, tabs, modal điều hướng
+    ├── types.ts                # Định nghĩa kiểu dữ liệu TypeScript
+    ├── data/
+    │   ├── words.ts            # 800 từ vựng chuẩn HSK 1 (300), HSK 2 (200), HSK 3 (300)
+    │   ├── exams.ts            # Ngân hàng đề thi thử HSK 1 & HSK 2 (40–60 câu chuẩn CTI)
+    │   ├── phonics.ts          # 23 thanh mẫu, 36 vận mẫu, 4 thanh điệu, 8 nét cơ bản
+    │   ├── grammar.ts          # Cặp từ dễ nhầm (二/两, 会/能/可以, 的/得/地...) & cấu trúc câu
+    │   └── readers.ts          # Bài đọc tương tác phân cấp với click tra từ 1-chạm
+    ├── utils/
+    │   ├── core.ts             # Thuật toán lặp lại cách quãng SM-2, toneOf, scoreExam
+    │   ├── audioFx.ts          # Web Audio Synthesizer: phách gỗ, khánh ngọc, chuông thiền
+    │   ├── tts.ts              # SpeechSynthesis tiếng Trung phổ thông (zh-CN)
+    │   ├── speech.ts           # Web Speech API nhận diện giọng nói & chấm điểm phát âm
+    │   └── storage.ts          # Quản lý localStorage, streak, thống kê, xuất/nhập file JSON
+    └── components/
+        ├── TopBar.tsx          # Thanh điều hướng trên cùng, chuyển cấp độ (0, 1, 2, 3, Tất cả)
+        ├── TabBar.tsx          # Thanh điều hướng tab dưới đáy (Học, Thi thử, Từ điển, Viết, Tiến độ)
+        ├── Toast.tsx           # Thông báo nhanh
+        ├── views/
+        │   ├── HomeView.tsx    # Trang chủ: kế hoạch học, linh vật, bento shortcuts, danh sách bài
+        │   ├── ExamView.tsx    # Trang thi thử HSK: giới thiệu đề, lịch sử thi
+        │   ├── DictView.tsx    # Từ điển tra cứu nhanh, lọc theo trạng thái
+        │   ├── WriteView.tsx   # Luyện viết chữ Hán, bảng vẽ mực tàu, 8 quy tắc vàng
+        │   ├── ProgressView.tsx# Thống kê tiến độ, biểu đồ 14 ngày, heatmap 52 tuần, ma trận trí nhớ
+        │   ├── PhonicsView.tsx # Bảng ngữ âm Pinyin, biểu đồ cao độ thanh điệu, 8 nét cơ bản
+        │   ├── GrammarView.tsx # So sánh sắc thái ngữ pháp & công thức câu
+        │   ├── ReaderView.tsx  # Trình đọc tương tác tra từ tức thì
+        │   └── SpeechView.tsx  # Luyện phát âm AI zh-CN với micro
+        └── modals/
+            ├── StudySessionModal.tsx # Phiên học thẻ ghi nhớ / trắc nghiệm phản xạ
+            ├── ExamModal.tsx   # Phòng thi thử trực tuyến đếm ngược thời gian, chấm điểm
+            ├── LookupModal.tsx # Popup tra từ nhanh
+            ├── WriteModal.tsx  # Popup vẽ động bút thuận chữ Hán (HanziWriter)
+            ├── SettingsModal.tsx # Cài đặt âm thanh, mục tiêu, sao lưu/khôi phục
+            ├── WelcomeModal.tsx # Màn hình chào mừng onboarding
+            └── IntroModal.tsx  # Giới thiệu chi tiết lộ trình HSK 3.0
+```
 
-Sau khi sửa file tĩnh, tăng `VERSION` trong `sw.js` để tự động làm mới cache cho người dùng.
+---
 
-## Dữ liệu & giấy phép
+## 🌟 Các tính năng cốt lõi
 
-- Danh sách từ: đề cương HSK 2026 (HSK 3.0) do Trung tâm Hợp tác Giao lưu Ngôn ngữ (汉考国际/CTI) công bố. 800 từ HSK 1 + HSK 2 + HSK 3 khớp 100% danh sách chính thức.
-- Pinyin, âm Hán–Việt, nghĩa tiếng Việt: biên soạn cho dự án. Tham chiếu Unihan (`kMandarin`, `kVietnamese`) và CC-CEDICT (CC BY-SA 3.0).
-- Luyện viết: Hanzi-writer + HTML5 Virtual Stroke Canvas nội bộ.
-- Âm thanh: Sử dụng Web Audio API và Web Speech API có sẵn trên trình duyệt.
-- Không sử dụng đề thi thật hay giáo trình có bản quyền.
+1. **800 từ vựng HSK 1, HSK 2 & HSK 3** (Chuẩn HSK 3.0): Đầy đủ chữ Hán, Pinyin có màu thanh điệu, âm Hán–Việt và nghĩa tiếng Việt.
+2. **Thuật toán Spaced Repetition (SM-2)**: Lập lịch ôn tập tối ưu cho từng từ vựng dựa trên độ ghi nhớ của người học.
+3. **Phòng thi thử chuẩn quốc tế**:
+   - HSK 1: 40 câu trắc nghiệm (Nghe + Đọc), 35 phút.
+   - HSK 2: 60 câu trắc nghiệm (Nghe + Đọc), 55 phút.
+   - Chấm điểm tự động thang 200 điểm, phân tích chi tiết đáp án và lưu lịch sử thi.
+4. **Bảng ngữ âm Pinyin & 8 nét chữ Hán**: Biểu đồ trực quan đường cong cao độ của 4 thanh điệu và 8 nét cơ bản (Vĩnh Tự Bát Pháp).
+5. **AI Speech Recognition zh-CN**: Chấm điểm phát âm bằng Web Speech API trực tiếp trong trình duyệt, phản hồi % độ chính xác.
+6. **Bảng thư pháp tự do (Virtual Stroke Canvas)**: Mô phỏng nét bút lông biến thiên độ dày theo tốc độ di chuyển, hỗ trợ lưới Mễ (米) và Điền (田).
+7. **Trình đọc tương tác (HSK Reader)**: Đoạn văn ngắn phân cấp, bật/tắt pinyin, chạm vào từ bất kỳ để mở popup tra cứu tức thì.
+8. **Âm thanh tổng hợp Web Audio API**: Tự động tạo âm thanh phách gỗ gõ nhịp, khánh ngọc ngũ cung ngân vang và chuông thiền thư thái.
+9. **Bảo mật & Không cần tài khoản**: Lưu trữ 100% dữ liệu cục bộ, hỗ trợ xuất/nhập file backup JSON an toàn.

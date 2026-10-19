@@ -4,35 +4,34 @@
    0 byte file mp3 · Không cần mạng · Âm sắc khánh ngọc & chuông cổ.
    ========================================================= */
 
-(function (global) {
-  "use strict";
+let ctx: AudioContext | null = null;
 
-  var ctx = null;
-
-  function getAudioCtx() {
-    if (!ctx) {
-      var AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (AudioContext) {
-        ctx = new AudioContext();
-      }
+function getAudioCtx(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  if (!ctx) {
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (AudioContextClass) {
+      ctx = new AudioContextClass();
     }
-    if (ctx && ctx.state === "suspended") {
-      ctx.resume();
-    }
-    return ctx;
   }
+  if (ctx && ctx.state === "suspended") {
+    ctx.resume();
+  }
+  return ctx;
+}
 
-  var SoundFX = {
-    enabled: true,
+export const SoundFX = {
+  enabled: true,
 
-    // Gõ phách gỗ nhẹ nhàng khi chạm nút
-    tap: function () {
-      if (!this.enabled) return;
-      var c = getAudioCtx();
-      if (!c) return;
+  // Gõ phách gỗ nhẹ nhàng khi chạm nút
+  tap: function () {
+    if (!this.enabled) return;
+    const c = getAudioCtx();
+    if (!c) return;
 
-      var osc = c.createOscillator();
-      var gain = c.createGain();
+    try {
+      const osc = c.createOscillator();
+      const gain = c.createGain();
 
       osc.type = "sine";
       osc.frequency.setValueAtTime(480, c.currentTime);
@@ -46,18 +45,22 @@
 
       osc.start();
       osc.stop(c.currentTime + 0.045);
-    },
+    } catch (e) {
+      // AudioContext may be blocked before interaction
+    }
+  },
 
-    // Khánh ngọc ngân vang khi trả lời đúng (Jade bell resonance)
-    correct: function () {
-      if (!this.enabled) return;
-      var c = getAudioCtx();
-      if (!c) return;
+  // Khánh ngọc ngân vang khi trả lời đúng (Jade bell resonance)
+  correct: function () {
+    if (!this.enabled) return;
+    const c = getAudioCtx();
+    if (!c) return;
 
-      var notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6 (Hợp âm Ngũ Cung)
-      notes.forEach(function (freq, i) {
-        var osc = c.createOscillator();
-        var gain = c.createGain();
+    try {
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6 (Hợp âm Ngũ Cung)
+      notes.forEach((freq, i) => {
+        const osc = c.createOscillator();
+        const gain = c.createGain();
 
         osc.type = "sine";
         osc.frequency.setValueAtTime(freq, c.currentTime + i * 0.04);
@@ -71,16 +74,23 @@
         osc.start(c.currentTime + i * 0.04);
         osc.stop(c.currentTime + i * 0.04 + 0.36);
       });
-    },
+    } catch (e) {}
+  },
 
-    // Âm trầm đục nhẹ nhàng khi chưa chính xác
-    wrong: function () {
-      if (!this.enabled) return;
-      var c = getAudioCtx();
-      if (!c) return;
+  // Alias for correct
+  bell: function () {
+    this.correct();
+  },
 
-      var osc = c.createOscillator();
-      var gain = c.createGain();
+  // Âm trầm đục nhẹ nhàng khi chưa chính xác
+  wrong: function () {
+    if (!this.enabled) return;
+    const c = getAudioCtx();
+    if (!c) return;
+
+    try {
+      const osc = c.createOscillator();
+      const gain = c.createGain();
 
       osc.type = "triangle";
       osc.frequency.setValueAtTime(160, c.currentTime);
@@ -94,24 +104,26 @@
 
       osc.start();
       osc.stop(c.currentTime + 0.19);
-    },
+    } catch (e) {}
+  },
 
-    // Chuông thiền sâu lắng khi hoàn thành bài học / nộp bài thi
-    zenBell: function () {
-      if (!this.enabled) return;
-      var c = getAudioCtx();
-      if (!c) return;
+  // Chuông thiền sâu lắng khi hoàn thành bài học / nộp bài thi
+  zenBell: function () {
+    if (!this.enabled) return;
+    const c = getAudioCtx();
+    if (!c) return;
 
-      var baseFreq = 440; // A4
-      var partials = [1, 2.76, 5.4, 8.9];
-      partials.forEach(function (p, idx) {
-        var osc = c.createOscillator();
-        var gain = c.createGain();
+    try {
+      const baseFreq = 440; // A4
+      const partials = [1, 2.76, 5.4, 8.9];
+      partials.forEach((p, idx) => {
+        const osc = c.createOscillator();
+        const gain = c.createGain();
 
         osc.type = "sine";
         osc.frequency.setValueAtTime(baseFreq * p, c.currentTime);
 
-        var vol = 0.12 / (idx + 1);
+        const vol = 0.12 / (idx + 1);
         gain.gain.setValueAtTime(vol, c.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.00001, c.currentTime + 1.2);
 
@@ -121,16 +133,18 @@
         osc.start();
         osc.stop(c.currentTime + 1.25);
       });
-    },
+    } catch (e) {}
+  },
 
-    // Chiêng đồng báo giờ vào phòng thi
-    gong: function () {
-      if (!this.enabled) return;
-      var c = getAudioCtx();
-      if (!c) return;
+  // Chiêng đồng báo giờ vào phòng thi
+  gong: function () {
+    if (!this.enabled) return;
+    const c = getAudioCtx();
+    if (!c) return;
 
-      var osc = c.createOscillator();
-      var gain = c.createGain();
+    try {
+      const osc = c.createOscillator();
+      const gain = c.createGain();
 
       osc.type = "sine";
       osc.frequency.setValueAtTime(220, c.currentTime);
@@ -144,8 +158,6 @@
 
       osc.start();
       osc.stop(c.currentTime + 0.9);
-    }
-  };
-
-  global.SoundFX = SoundFX;
-})(typeof window !== "undefined" ? window : globalThis);
+    } catch (e) {}
+  }
+};
