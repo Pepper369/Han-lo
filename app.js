@@ -19,8 +19,10 @@
   var CHARS = [];
 
   function setLevel(lvl) {
-    currentLvl = String(lvl || "1");
-    if (currentLvl === "1") {
+    currentLvl = String(lvl != null ? lvl : "1");
+    if (currentLvl === "0") {
+      WORDS = ALL_WORDS.filter(function (w) { return w.level === 1; });
+    } else if (currentLvl === "1") {
       WORDS = ALL_WORDS.filter(function (w) { return w.level === 1; });
     } else if (currentLvl === "2") {
       WORDS = ALL_WORDS.filter(function (w) { return w.level === 2; });
@@ -44,7 +46,8 @@
 
     var subEl = $("#brand-sub");
     if (subEl) {
-      if (currentLvl === "1") subEl.textContent = "HSK 1 · 300 từ";
+      if (currentLvl === "0") subEl.textContent = "Chặng 0 · Nhập môn Phát âm & Bút thuận";
+      else if (currentLvl === "1") subEl.textContent = "HSK 1 · 300 từ";
       else if (currentLvl === "2") subEl.textContent = "HSK 2 · 200 từ";
       else if (currentLvl === "3") subEl.textContent = "HSK 3 · 300 từ";
       else subEl.textContent = "HSK 1+2+3 · 800 từ";
@@ -256,6 +259,133 @@
       ? "Chuỗi <b>" + S.streak.count + " ngày</b> rồi! Tinh thần ngút ngàn, tiếp tục phát huy nhé!"
       : (due.length ? "Hôm nay có <b>" + due.length + " từ</b> cần ôn tập. Ôn xong hãy học từ mới nhé!" : "Mỗi ngày 15 phút, kiên trì tích tiểu thành đại!");
 
+    var roadmapHtml =
+      '<section class="roadmap-card">' +
+        '<div class="roadmap-head">' +
+          '<div>' +
+            '<p class="eyebrow" style="margin:0">Lộ Trình Toàn Diện</p>' +
+            '<h3 style="margin:2px 0">Từ Con Số 0 Đến HSK 3</h3>' +
+          '</div>' +
+          '<button class="btn ghost small" data-act="set-roadmap-lvl" data-lvl="0">Bắt đầu từ số 0</button>' +
+        '</div>' +
+        '<div class="roadmap-track">' +
+          '<div class="roadmap-step' + (currentLvl === "0" ? ' active' : '') + '" data-act="set-roadmap-lvl" data-lvl="0">' +
+            '<span class="roadmap-step-badge">Khởi động</span>' +
+            '<span class="roadmap-step-icon">🌱</span>' +
+            '<span class="roadmap-step-title">Chặng 0</span>' +
+            '<span class="roadmap-step-desc">Âm tiết &amp; Nét</span>' +
+          '</div>' +
+          '<div class="roadmap-step' + (currentLvl === "1" ? ' active' : '') + '" data-act="set-roadmap-lvl" data-lvl="1">' +
+            '<span class="roadmap-step-badge">Nền tảng</span>' +
+            '<span class="roadmap-step-icon">🥉</span>' +
+            '<span class="roadmap-step-title">HSK 1</span>' +
+            '<span class="roadmap-step-desc">300 từ cốt lõi</span>' +
+          '</div>' +
+          '<div class="roadmap-step' + (currentLvl === "2" ? ' active' : '') + '" data-act="set-roadmap-lvl" data-lvl="2">' +
+            '<span class="roadmap-step-badge">Mở rộng</span>' +
+            '<span class="roadmap-step-icon">🥈</span>' +
+            '<span class="roadmap-step-title">HSK 2</span>' +
+            '<span class="roadmap-step-desc">+200 từ vựng</span>' +
+          '</div>' +
+          '<div class="roadmap-step' + (currentLvl === "3" ? ' active' : '') + '" data-act="set-roadmap-lvl" data-lvl="3">' +
+            '<span class="roadmap-step-badge">Bứt phá</span>' +
+            '<span class="roadmap-step-icon">🥇</span>' +
+            '<span class="roadmap-step-title">HSK 3</span>' +
+            '<span class="roadmap-step-desc">+300 từ vựng</span>' +
+          '</div>' +
+        '</div>' +
+      '</section>';
+
+    if (currentLvl === "0") {
+      $("#view-home").innerHTML =
+        '<div class="mascot-box">' +
+          '<svg class="mascot-avatar" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
+            '<circle cx="32" cy="32" r="28" fill="#eaf4f0" stroke="#2f6f5e" stroke-width="2"/>' +
+            '<path d="M22 18 Q20 10 15 12 Q18 16 22 20" fill="#b97a12"/>' +
+            '<path d="M42 18 Q44 10 49 12 Q46 16 42 20" fill="#b97a12"/>' +
+            '<ellipse cx="32" cy="34" rx="18" ry="16" fill="#2f6f5e"/>' +
+            '<circle cx="26" cy="32" r="4.5" fill="#fff"/>' +
+            '<circle cx="26" cy="32" r="2.5" fill="#211f1b"/>' +
+            '<circle cx="38" cy="32" r="4.5" fill="#fff"/>' +
+            '<circle cx="38" cy="32" r="2.5" fill="#211f1b"/>' +
+            '<path d="M28 41 Q32 45 36 41" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>' +
+          '</svg>' +
+          '<div class="mascot-bubble">Chào mừng bạn bắt đầu từ con số 0! Hãy học vững <b>âm tiết Pinyin</b> và <b>8 nét chữ Hán</b> trước khi học từ vựng nhé!</div>' +
+        '</div>' +
+        roadmapHtml +
+        '<section class="card hero">' +
+          '<p class="eyebrow">Chặng 0 · Vạch Xuất Phát Cho Người Mới</p>' +
+          '<h2>Khởi Động: Âm Tiết, Đi Nét &amp; Phát Âm</h2>' +
+          '<p class="muted small" style="margin:4px 0 14px">Hoàn thành 6 bài học nhập môn để tạo nền tảng vững chắc nhất trước khi học 300 từ HSK 1.</p>' +
+          '<div class="zero-lesson-list">' +
+            '<div class="zero-lesson-item" data-nav="phonics">' +
+              '<div class="zli-left">' +
+                '<span class="zli-icon">🎵</span>' +
+                '<div class="zli-text">' +
+                  '<h4>1. 5 Thanh Điệu &amp; Đồ Thị Cao Độ</h4>' +
+                  '<p>Thanh 1, 2, 3, 4, khinh thanh &amp; quy tắc biến điệu 3+3, 不, 一</p>' +
+                '</div>' +
+              '</div>' +
+              '<span class="badge s-learning">Học ngay →</span>' +
+            '</div>' +
+            '<div class="zero-lesson-item" data-nav="phonics">' +
+              '<div class="zli-left">' +
+                '<span class="zli-icon">🗣️</span>' +
+                '<div class="zli-text">' +
+                  '<h4>2. 23 Thanh Mẫu (Phụ Âm Đầu)</h4>' +
+                  '<p>Phân biệt âm môi b/p/m/f, âm uốn lưỡi zh/ch/sh/r, âm răng z/c/s</p>' +
+                '</div>' +
+              '</div>' +
+              '<span class="badge s-learning">Khám phá →</span>' +
+            '</div>' +
+            '<div class="zero-lesson-item" data-nav="phonics">' +
+              '<div class="zli-left">' +
+                '<span class="zli-icon">🎶</span>' +
+                '<div class="zli-text">' +
+                  '<h4>3. 36 Vận Mẫu (Nguyên Âm Đơn, Kép, Mũi)</h4>' +
+                  '<p>6 nguyên âm đơn, 13 nguyên âm kép, 16 âm mũi &amp; âm uốn lưỡi er</p>' +
+                '</div>' +
+              '</div>' +
+              '<span class="badge s-learning">Xem bảng →</span>' +
+            '</div>' +
+            '<div class="zero-lesson-item" data-nav="phonics">' +
+              '<div class="zli-left">' +
+                '<span class="zli-icon">✍️</span>' +
+                '<div class="zli-text">' +
+                  '<h4>4. 8 Nét Chữ Hán Cơ Bản (Vĩnh Tự Bát Pháp)</h4>' +
+                  '<p>Chấm (点), Ngang (横), Sổ (竖), Phẩy (撇), Mác (捺), Hất (提), Gập (折), Móc (钩)</p>' +
+                '</div>' +
+              '</div>' +
+              '<span class="badge s-mastered">Tập đi nét →</span>' +
+            '</div>' +
+            '<div class="zero-lesson-item" data-nav="write">' +
+              '<div class="zli-left">' +
+                '<span class="zli-icon">📜</span>' +
+                '<div class="zli-text">' +
+                  '<h4>5. 8 Quy Tắc Bút Thuận Vàng</h4>' +
+                  '<p>Ngang trước sổ sau, trên trước dưới sau, trái trước phải sau, ngoài trước trong sau...</p>' +
+                '</div>' +
+              '</div>' +
+              '<span class="badge s-mastered">Xem quy tắc →</span>' +
+            '</div>' +
+            '<div class="zero-lesson-item" data-nav="speech">' +
+              '<div class="zli-left">' +
+                '<span class="zli-icon">🎙️</span>' +
+                '<div class="zli-text">' +
+                  '<h4>6. Web Speech AI Luyện Phát Âm Trực Tiếp</h4>' +
+                  '<p>Bật micro đọc thử chữ Hán &amp; nhận phản hồi chấm điểm tức thì</p>' +
+                '</div>' +
+              '</div>' +
+              '<span class="badge s-learning">Luyện nói →</span>' +
+            '</div>' +
+          '</div>' +
+          '<div style="margin-top:16px">' +
+            '<button class="btn primary wide" data-act="set-roadmap-lvl" data-lvl="1">🚀 Tiến lên Chặng 1: Học từ vựng HSK 1 (300 từ)</button>' +
+          '</div>' +
+        '</section>';
+      return;
+    }
+
     $("#view-home").innerHTML =
       '<div class="mascot-box">' +
         '<svg class="mascot-avatar" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
@@ -277,6 +407,8 @@
         '</svg>' +
         '<div class="mascot-bubble">' + mascotMsg + '</div>' +
       '</div>' +
+
+      roadmapHtml +
 
       '<section class="card hero">' +
         '<p class="eyebrow">' + esc(todayLabel()) + "</p>" +
@@ -630,39 +762,74 @@
       '</button>';
     }).join("");
 
-    var rulesHtml = pData.rules.map(function (r) {
-      return '<div class="rule-card">' +
-        '<h4 style="margin:0 0 4px;color:var(--amber)">' + r.title + '</h4>' +
-        '<p class="small" style="margin:0 0 6px">' + r.rule + '</p>' +
-        '<div class="small muted"><b>Ví dụ:</b> ' + r.example + '</div>' +
+    var strokesHtml = (pData.basicStrokes || []).map(function (s) {
+      return '<div class="stroke-card">' +
+        '<div class="stroke-card-header">' +
+          '<div class="stroke-symbol-box">' + esc(s.symbol) + '</div>' +
+          '<div class="stroke-card-info">' +
+            '<h4>' + esc(s.name) + '</h4>' +
+            '<span>' + esc(s.zh) + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="stroke-card-dir"><b>Cách đi nét:</b> ' + esc(s.direction) + '</div>' +
+        '<div class="small muted" style="margin-bottom:8px">💡 <i>' + esc(s.tip) + '</i></div>' +
+        '<div class="stroke-card-footer">' +
+          '<span class="stroke-ex-tag">Ví dụ: <b>' + esc(s.examples.join(" · ")) + '</b></span>' +
+          '<button class="btn ghost small" data-act="char-stroke" data-char="' + esc(s.examples[0]) + '">' +
+            '✍️ Xem đi nét' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+
+    var strokeRulesHtml = (window.STROKE_RULES || []).map(function (r, idx) {
+      return '<div class="rule-item">' +
+        '<span class="rule-num">' + (idx + 1) + '</span>' +
+        '<div style="flex:1">' +
+          '<div><b>' + esc(r.title) + '</b> <span class="muted">(' + esc(r.zh) + ')</span></div>' +
+          '<div class="small muted">' + esc(r.desc) + ' · Ví dụ: <b style="color:var(--jade)">' + esc(r.example) + '</b></div>' +
+        '</div>' +
       '</div>';
     }).join("");
 
     $("#view-phonics").innerHTML =
       '<div class="row-between" style="margin-bottom:14px">' +
         '<div>' +
-          '<p class="eyebrow">Chuẩn Âm Bắc Kinh</p>' +
-          '<h2 style="margin:2px 0">Ngữ Âm Pinyin &amp; Thanh Điệu</h2>' +
+          '<p class="eyebrow">Chặng 0 · Nền Tảng Từ Số 0</p>' +
+          '<h2 style="margin:2px 0">Âm Tiết, Thanh Điệu &amp; Đi Nét</h2>' +
         '</div>' +
         '<button class="btn ghost small" data-nav="home">← Trang chủ</button>' +
       '</div>' +
       '<section class="card phonics-section">' +
-        '<h3>4 Thanh Điệu Chính Thức</h3>' +
+        '<div class="row-between">' +
+          '<h3>1. 8 Nét Cơ Bản Của Chữ Hán (永字八法)</h3>' +
+          '<span class="badge s-mastered">Bút Họa</span>' +
+        '</div>' +
+        '<p class="muted small">Vĩnh Tự Bát Pháp: 8 nét chữ cơ bản cấu thành mọi chữ Hán. Nhấn "Xem đi nét" để xem thứ tự nét viết.</p>' +
+        '<div class="basic-strokes-grid">' + strokesHtml + '</div>' +
+      '</section>' +
+      '<section class="card phonics-section">' +
+        '<h3>2. 8 Quy Tắc Bút Thuận Vàng</h3>' +
+        '<p class="muted small">Quy tắc viết chữ Hán từ trên xuống dưới, từ trái sang phải, trong ngoài trước sau.</p>' +
+        '<div style="margin-top:10px">' + strokeRulesHtml + '</div>' +
+      '</section>' +
+      '<section class="card phonics-section">' +
+        '<h3>3. 5 Thanh Điệu Chính Thức</h3>' +
         '<p class="muted small">Biểu đồ cao độ 5 mức chuẩn quốc tế giúp khắc phục triệt để lỗi phát âm thanh 1 và thanh 4 của người Việt.</p>' +
         '<div class="tone-grid">' + tonesHtml + '</div>' +
       '</section>' +
       '<section class="card phonics-section">' +
-        '<h3>23 Thanh Mẫu (Phụ âm đầu)</h3>' +
+        '<h3>4. 23 Thanh Mẫu (Phụ âm đầu)</h3>' +
         '<p class="muted small">Chạm vào từng phụ âm để nghe âm mẫu chuẩn.</p>' +
         '<div class="pinyin-chips">' + initialsHtml + '</div>' +
       '</section>' +
       '<section class="card phonics-section">' +
-        '<h3>36 Vận Mẫu (Nguyên âm)</h3>' +
+        '<h3>5. 36 Vận Mẫu (Nguyên âm)</h3>' +
         '<p class="muted small">Chạm vào từng vần để nghe âm mẫu chuẩn.</p>' +
         '<div class="pinyin-chips">' + finalsHtml + '</div>' +
       '</section>' +
       '<section class="card phonics-section">' +
-        '<h3>Quy Tắc Biến Điệu Quan Trọng</h3>' +
+        '<h3>6. Quy Tắc Biến Điệu Quan Trọng</h3>' +
         rulesHtml +
       '</section>';
   }
@@ -801,12 +968,30 @@
 
   function openLookup(tok) {
     if (window.SoundFX) SoundFX.tap();
+    var chars = Array.from(tok.hz || "");
+    var syls = Core.syllables(tok.py || "");
+    var charStrokesHtml = "";
+    if (chars.length > 0) {
+      charStrokesHtml = '<div style="margin:14px 0 6px;text-align:left">' +
+        '<div class="muted small" style="margin-bottom:6px;font-weight:600">Tập viết &amp; đi nét từng chữ:</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+          chars.map(function (ch, idx) {
+            var s = syls[idx] || "";
+            return '<button class="btn ghost small" data-act="char-stroke" data-char="' + esc(ch) + '" style="font-size:12.5px">' +
+              '✍️ Viết chữ <b>' + esc(ch) + '</b>' + (s ? ' [' + esc(s) + ']' : '') +
+            '</button>';
+          }).join("") +
+        '</div>' +
+      '</div>';
+    }
+
     $("#lookup-body").innerHTML =
       '<div class="lookup-hz">' + esc(tok.hz) + '</div>' +
       '<div class="lookup-py">' + pinyinHTML(tok.py) + '</div>' +
       '<div class="lookup-hv">Âm Hán–Việt: <b>' + esc(tok.hv) + '</b></div>' +
       '<div class="lookup-vi">' + esc(tok.vi) + '</div>' +
-      '<button class="btn primary wide" data-act="say-sfx" data-text="' + esc(tok.hz) + '">🔊 Phát âm chuẩn</button>';
+      charStrokesHtml +
+      '<button class="btn primary wide" data-act="say-sfx" data-text="' + esc(tok.hz) + '" style="margin-top:12px">🔊 Phát âm chuẩn</button>';
     $("#lookupSheet").classList.remove("hidden");
   }
   function closeLookup() {
@@ -1209,6 +1394,41 @@
       "</div>";
 
     if (ses.mode === "learn" && ses.step === "intro" && !ses.answered) {
+      var chars = Array.from(w.h);
+      var syls = Core.syllables(w.p);
+      var charBreakdownHtml = "";
+      if (chars.length > 0) {
+        charBreakdownHtml =
+          '<div class="card-breakdown-box">' +
+            '<div class="row-between" style="margin-bottom:6px">' +
+              '<b class="small" style="color:var(--ink)">Đi nét &amp; Âm tiết từng chữ:</b>' +
+              '<span class="muted small">' + chars.length + ' chữ Hán</span>' +
+            '</div>' +
+            '<div class="char-breakdown-grid">' +
+              chars.map(function (ch, cIdx) {
+                var s = syls[cIdx] || "";
+                var t = s ? Core.toneOf(s) : 0;
+                var tName = t === 0 ? "Thanh nhẹ" : "Thanh " + t;
+                return '<div class="char-breakdown-item">' +
+                  '<div class="cbi-top">' +
+                    '<span class="cbi-char">' + esc(ch) + '</span>' +
+                    '<div class="cbi-meta">' +
+                      (s ? '<span class="cbi-py t' + t + '">' + esc(s) + '</span>' : '') +
+                      '<span class="cbi-tone-badge">' + tName + '</span>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="cbi-actions">' +
+                    '<button class="btn ghost small cbi-stroke-btn" data-act="char-stroke" data-char="' + esc(ch) + '">' +
+                      '✍️ Đi nét' +
+                    '</button>' +
+                    '<button class="icon-btn small" data-act="say-sfx" data-text="' + esc(ch) + '" title="Nghe âm chữ ' + esc(ch) + '">🔊</button>' +
+                  '</div>' +
+                '</div>';
+              }).join("") +
+            '</div>' +
+          '</div>';
+      }
+
       el.innerHTML = head +
         '<div class="card study">' +
           '<p class="eyebrow">Bài ' + w.lesson + " · từ mới</p>" +
@@ -1216,10 +1436,17 @@
           (S.settings.pinyin ? '<div class="pinyin-line">' + pinyinHTML(w.p) + "</div>" : "") +
           '<p class="hv-line">Hán–Việt: <b>' + esc(w.hv) + "</b></p>" +
           '<p class="meaning">' + esc(w.vi) + "</p>" +
-          '<button class="btn ghost say-btn" data-act="say" data-text="' + esc(w.h) + '">' +
-            '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg> Nghe phát âm' +
-          "</button>" +
-          '<button class="btn primary wide" data-act="continue">Đã hiểu → Kiểm tra</button>' +
+          charBreakdownHtml +
+          '<div style="display:flex;gap:8px;margin-top:10px">' +
+            '<button class="btn ghost say-btn" data-act="say" data-text="' + esc(w.h) + '" style="flex:1">' +
+              '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg> Nghe phát âm' +
+            '</button>' +
+            '<button class="btn ghost say-btn" data-act="card-mic" data-word="' + esc(w.h) + '" style="flex:1">' +
+              '🎙️ Luyện nói AI' +
+            '</button>' +
+          '</div>' +
+          '<div id="card-mic-status" class="small center muted" style="margin-top:6px"></div>' +
+          '<button class="btn primary wide" data-act="continue" style="margin-top:12px">Đã hiểu → Kiểm tra</button>' +
         "</div>";
       if (!ses.autoPlayed) {
         ses.autoPlayed = true;
@@ -1526,6 +1753,42 @@
         c.classList.toggle("active", c === el);
       });
       renderDictList();
+      return;
+    }
+    if (act === "set-roadmap-lvl") {
+      setLevel(el.dataset.lvl);
+      render();
+      return;
+    }
+    if (act === "char-stroke") {
+      openWriter(el.dataset.char);
+      return;
+    }
+    if (act === "card-mic") {
+      var wordText = el.dataset.word;
+      var statusEl = $("#card-mic-status");
+      if (!window.HanLoSpeech || !window.HanLoSpeech.isSupported) {
+        toast("Trình duyệt không hỗ trợ Web Speech API (Hãy dùng Chrome hoặc Edge)");
+        return;
+      }
+      if (statusEl) statusEl.innerHTML = '<span style="color:var(--jade)">🔴 Đang lắng nghe giọng bạn... Hãy đọc: <b>' + esc(wordText) + '</b></span>';
+      window.HanLoSpeech.startListening(
+        wordText,
+        function (res) {
+          if (statusEl) {
+            var color = res.score >= 80 ? "var(--jade)" : res.score >= 50 ? "var(--amber)" : "var(--red)";
+            statusEl.innerHTML = 'Bạn đã đọc: <b>' + (esc(res.text) || "(chưa rõ)") + '</b> · Điểm: <b style="color:' + color + '">' + res.score + '% (' + esc(res.grade) + ')</b>';
+          }
+          if (window.SoundFX) {
+            if (res.score >= 80) SoundFX.bell();
+            else if (res.score >= 50) SoundFX.tap();
+            else SoundFX.wrong();
+          }
+        },
+        function (err) {
+          if (statusEl) statusEl.textContent = "Nhận diện âm: " + (err || "Hãy thử lại");
+        }
+      );
       return;
     }
     if (act === "say-sfx") {

@@ -133,9 +133,85 @@ const PINYIN_DATA = {
       rule: "Đứng một mình đọc là yī. Đứng trước thanh 4 đổi thành yí (thanh 2). Đứng trước thanh 1, 2, 3 đổi thành yì (thanh 4).",
       example: "一个 (yī gè) ➔ [yí gè]; 一天 (yī tiān) ➔ [yì tiān]; 一起 (yī qǐ) ➔ [yì qǐ]."
     }
+  ],
+
+  basicStrokes: [
+    {
+      name: "Nét Chấm (点)",
+      zh: "点 diǎn",
+      symbol: "丶",
+      direction: "Chấm từ trên nhẹ xuống dưới sang phải đậm dần rồi thu bút",
+      tip: "Như giọt nước rơi hoặc tảng đá rơi từ trên cao",
+      examples: ["六", "主", "方", "门", "字"],
+      strokeChar: "丶"
+    },
+    {
+      name: "Nét Ngang (横)",
+      zh: "横 héng",
+      symbol: "一",
+      direction: "Từ trái sang phải, hơi chếch nhẹ lên 3-5 độ, đuôi nhấn nhẹ thu bút",
+      tip: "Đặt bút nhẹ, đi ngang đều tay, đuôi nét hơi nhấn dừng",
+      examples: ["一", "二", "三", "十", "大"],
+      strokeChar: "一"
+    },
+    {
+      name: "Nét Sổ (竖)",
+      zh: "竖 shù",
+      symbol: "丨",
+      direction: "Từ trên thẳng đứng xuống dưới (sổ kim vuốt nhọn hoặc sổ huyền tròn đuôi)",
+      tip: "Thẳng đứng như cột nhà, vững chãi không xiên vẹo",
+      examples: ["十", "中", "木", "日", "山"],
+      strokeChar: "丨"
+    },
+    {
+      name: "Nét Phẩy (撇)",
+      zh: "撇 piě",
+      symbol: "丿",
+      direction: "Từ trên cao chếch cong sang trái, đầu đậm đuôi vuốt nhọn dần",
+      tip: "Lướt như chiếc lá rơi, cong mềm thanh thoát",
+      examples: ["八", "人", "大", "月", "白"],
+      strokeChar: "丿"
+    },
+    {
+      name: "Nét Mác (捺)",
+      zh: "捺 nà",
+      symbol: "㇏",
+      direction: "Từ trên lượn nghiêng sang phải, càng xuống càng đậm, cuối nét bẹt rồi vuốt nhọn sang ngang",
+      tip: "Nét chân trụ vững chãi, đuôi nét có gót chân bẹt nhẹ",
+      examples: ["人", "大", "天", "文", "水"],
+      strokeChar: "人"
+    },
+    {
+      name: "Nét Hất (提)",
+      zh: "提 tí",
+      symbol: "㇀",
+      direction: "Từ dưới sang phải chếch lên, đặt bút đậm, hất nhanh và vuốt nhọn lên trên",
+      tip: "Hất dứt khoát từ trái dưới lên phải trên",
+      examples: ["地", "冷", "我", "江", "习"],
+      strokeChar: "习"
+    },
+    {
+      name: "Nét Gập (折)",
+      zh: "折 zhé",
+      symbol: "𠃍",
+      direction: "Đang đi ngang hoặc sổ thì nhấn góc dừng lại rồi chuyển hướng vuông góc",
+      tip: "Góc gập vuông vức, có lực nhấn tại góc cua",
+      examples: ["口", "日", "四", "五", "田"],
+      strokeChar: "口"
+    },
+    {
+      name: "Nét Móc (钩)",
+      zh: "钩 gōu",
+      symbol: "亅",
+      direction: "Đi nét sổ/ngang/nghiêng đến cuối thì dừng nhấn rồi móc nhọn nhanh ra ngoài",
+      tip: "Móc nhọn dứt khoát như lưỡi câu",
+      examples: ["小", "水", "你", "了", "于"],
+      strokeChar: "小"
+    }
   ]
 };
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = PINYIN_DATA;
 }
+

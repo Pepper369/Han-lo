@@ -357,4 +357,31 @@ t("stroke-canvas.js: bảng vẽ nét thư pháp và 8 quy tắc bút thuận v�
   assert.ok(src.includes("先撇后捺"), "phải có quy tắc Phẩy trước mác sau");
 });
 
+/* ---------- Phase 12: 8 Nét Cơ Bản & Lộ Trình 0 Đến HSK 3 ---------- */
+t("phonics-data.js: 8 nét cơ bản của chữ Hán (Vĩnh Tự Bát Pháp) và quy tắc biến điệu", () => {
+  const pData = require("./phonics-data.js");
+  assert.ok(Array.isArray(pData.basicStrokes), "phải có mảng basicStrokes");
+  assert.strictEqual(pData.basicStrokes.length, 8, "phải có đúng 8 nét cơ bản");
+  const strokeNames = pData.basicStrokes.map(s => s.name);
+  assert.ok(strokeNames.some(n => n.includes("Chấm")), "thiếu nét Chấm");
+  assert.ok(strokeNames.some(n => n.includes("Ngang")), "thiếu nét Ngang");
+  assert.ok(strokeNames.some(n => n.includes("Sổ")), "thiếu nét Sổ");
+  assert.ok(strokeNames.some(n => n.includes("Phẩy")), "thiếu nét Phẩy");
+  assert.ok(strokeNames.some(n => n.includes("Mác")), "thiếu nét Mác");
+  assert.ok(strokeNames.some(n => n.includes("Hất")), "thiếu nét Hất");
+  assert.ok(strokeNames.some(n => n.includes("Gập")), "thiếu nét Gập");
+  assert.ok(strokeNames.some(n => n.includes("Móc")), "thiếu nét Móc");
+});
+
+t("lộ trình học từ con số 0 đến HSK 3: cấp độ 0, đi nét từng chữ và âm tiết trong app.js", () => {
+  const appSrc = fs.readFileSync(path.join(DIR, "app.js"), "utf8");
+  const indexSrc = fs.readFileSync(path.join(DIR, "index.html"), "utf8");
+  assert.ok(indexSrc.includes('data-lvl="0"'), "phải có nút chọn cấp độ Số 0");
+  assert.ok(appSrc.includes('currentLvl === "0"'), "app.js phải xử lý cấp độ Số 0");
+  assert.ok(appSrc.includes("card-breakdown-box"), "app.js phải có khối phân tích đi nét từng chữ");
+  assert.ok(appSrc.includes("char-stroke"), "app.js phải có hành động mở bút thuận đi nét chữ");
+  assert.ok(appSrc.includes("card-mic"), "app.js phải có chức năng luyện nói trực tiếp trong thẻ từ");
+});
+
 console.log("\n" + pass + " test(s) pass" + (process.exitCode ? " — CÓ LỖI" : ""));
+

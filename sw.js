@@ -1,6 +1,6 @@
 /* Service worker: app chạy offline sau lần mở đầu tiên.
    Đổi VERSION khi sửa file tĩnh để buộc cập nhật cache. */
-const VERSION = "hanlo-v1.4.0";
+const VERSION = "hanlo-v1.5.0";
 const CDN_CACHE = VERSION + "-cdn";
 const SHELL = [
   "./index.html",
