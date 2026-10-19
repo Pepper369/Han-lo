@@ -95,8 +95,10 @@
       });
     }
 
-    const listeningScore = listeningCorrect * 5; // 20 câu * 5đ = 100đ
-    const readingScore = readingCorrect * 5;     // 20 câu * 5đ = 100đ
+    const lTotal = exam.listeningCount || 20;
+    const rTotal = exam.readingCount || 20;
+    const listeningScore = Math.round((listeningCorrect / (lTotal || 1)) * 100);
+    const readingScore = Math.round((readingCorrect / (rTotal || 1)) * 100);
     const totalScore = listeningScore + readingScore; // 200đ
     const passingScore = exam.passingScore || 120;
     const passed = totalScore >= passingScore;

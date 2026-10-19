@@ -1,6 +1,6 @@
 /* Service worker: app chạy offline sau lần mở đầu tiên.
    Đổi VERSION khi sửa file tĩnh để buộc cập nhật cache. */
-const VERSION = "hanlo-v1.3.0";
+const VERSION = "hanlo-v1.4.0";
 const CDN_CACHE = VERSION + "-cdn";
 const SHELL = [
   "./index.html",
@@ -8,11 +8,15 @@ const SHELL = [
   "./404.html",
   "./styles.css",
   "./audio-fx.js",
+  "./db.js",
+  "./data.js",
+  "./hsk3-data.js",
   "./phonics-data.js",
   "./grammar-data.js",
   "./reader-data.js",
-  "./data.js",
   "./exam-data.js",
+  "./speech-recognition.js",
+  "./stroke-canvas.js",
   "./core.js",
   "./app.js",
   "./manifest.webmanifest",

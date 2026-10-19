@@ -31,7 +31,8 @@
       <div class="level-switch" id="level-switch" role="group" aria-label="Chọn cấp độ HSK">
         <button class="level-pill active" data-lvl="1">HSK 1</button>
         <button class="level-pill" data-lvl="2">HSK 2</button>
-        <button class="level-pill" data-lvl="all">Cả 2</button>
+        <button class="level-pill" data-lvl="3">HSK 3</button>
+        <button class="level-pill" data-lvl="all">Tất cả</button>
       </div>
       <span class="streak" id="streak-chip" title="Chuỗi ngày học">🔥 <b id="streak-n">0</b></span>
       <button class="icon-btn" id="btn-settings" aria-label="Cài đặt">
@@ -76,12 +77,14 @@
       </div>
     </div>
     <div class="char-grid" id="char-grid"></div>
+    <div id="virtual-canvas-section" style="margin-top:24px"></div>
   </main>
 
   <main id="view-exam" class="view hidden"></main>
   <main id="view-phonics" class="view hidden"></main>
   <main id="view-grammar" class="view hidden"></main>
   <main id="view-reader" class="view hidden"></main>
+  <main id="view-speech" class="view hidden"></main>
 
   <nav class="tabbar" aria-label="Điều hướng chính">
     <button class="tab active" data-nav="home">
@@ -201,13 +204,17 @@
 
 <div id="toast" class="toast hidden" role="status"></div>
 
-<script src="audio-fx.js?v=1.3.0"></script>
-<script src="data.js?v=1.3.0"></script>
-<script src="phonics-data.js?v=1.3.0"></script>
-<script src="grammar-data.js?v=1.3.0"></script>
-<script src="reader-data.js?v=1.3.0"></script>
-<script src="exam-data.js?v=1.3.0"></script>
-<script src="core.js?v=1.3.0"></script>
-<script src="app.js?v=1.3.0"></script>
+<script src="audio-fx.js?v=1.4.0"></script>
+<script src="db.js?v=1.4.0"></script>
+<script src="data.js?v=1.4.0"></script>
+<script src="hsk3-data.js?v=1.4.0"></script>
+<script src="phonics-data.js?v=1.4.0"></script>
+<script src="grammar-data.js?v=1.4.0"></script>
+<script src="reader-data.js?v=1.4.0"></script>
+<script src="exam-data.js?v=1.4.0"></script>
+<script src="speech-recognition.js?v=1.4.0"></script>
+<script src="stroke-canvas.js?v=1.4.0"></script>
+<script src="core.js?v=1.4.0"></script>
+<script src="app.js?v=1.4.0"></script>
 </body>
 </html>

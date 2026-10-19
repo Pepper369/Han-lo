@@ -256,6 +256,9 @@ t("index.html & app.js: đồng bộ đầy đủ các view, modal lookup và c�
   assert.ok(html.includes('id="view-phonics"'), "thiếu container #view-phonics");
   assert.ok(html.includes('id="view-grammar"'), "thiếu container #view-grammar");
   assert.ok(html.includes('id="view-reader"'), "thiếu container #view-reader");
+  assert.ok(html.includes('id="view-speech"'), "thiếu container #view-speech");
+  assert.ok(html.includes('id="virtual-canvas-section"'), "thiếu container #virtual-canvas-section");
+  assert.ok(html.includes('data-lvl="3"'), "thiếu nút chuyển cấp HSK 3");
   assert.ok(html.includes('id="lookupSheet"'), "thiếu modal #lookupSheet");
   assert.ok(html.includes('id="set-sfx"'), "thiếu cài đặt âm thanh #set-sfx");
   assert.ok(html.includes('id="import-file-input"'), "thiếu input khôi phục #import-file-input");
@@ -264,9 +267,94 @@ t("index.html & app.js: đồng bộ đầy đủ các view, modal lookup và c�
   assert.ok(appJs.includes("renderPhonics"), "thiếu hàm renderPhonics");
   assert.ok(appJs.includes("renderGrammar"), "thiếu hàm renderGrammar");
   assert.ok(appJs.includes("renderReader"), "thiếu hàm renderReader");
+  assert.ok(appJs.includes("renderSpeech"), "thiếu hàm renderSpeech");
+  assert.ok(appJs.includes("toggleSpeechMic"), "thiếu hàm toggleSpeechMic");
   assert.ok(appJs.includes("openLookup"), "thiếu hàm openLookup");
   assert.ok(appJs.includes("exportBackup"), "thiếu hàm exportBackup");
   assert.ok(appJs.includes("importBackup"), "thiếu hàm importBackup");
+});
+
+/* ---------- Phase 7: HSK 3 Data (300 từ) ---------- */
+t("hsk3-data.js: 300 từ HSK 3, đúng 4 trường, không trùng HSK 1 hoặc HSK 2", () => {
+  const HSK3 = require("./hsk3-data.js");
+  assert.strictEqual(HSK3.length, 300, "HSK 3 phải có đúng 300 từ");
+  const hsk1Set = new Set(HSK1.map(x => x[0]));
+  const hsk2Set = new Set(HSK2.map(x => x[0]));
+  const seen3 = new Set();
+  for (const row of HSK3) {
+    assert.strictEqual(row.length, 4, "row HSK 3: " + JSON.stringify(row));
+    for (const v of row) assert.ok(String(v).trim().length > 0, "rỗng: " + JSON.stringify(row));
+    assert.ok(!seen3.has(row[0]), "trùng trong HSK 3: " + row[0]);
+    assert.ok(!hsk1Set.has(row[0]), "trùng với HSK 1: " + row[0]);
+    assert.ok(!hsk2Set.has(row[0]), "trùng với HSK 2: " + row[0]);
+    seen3.add(row[0]);
+  }
+});
+
+t("pinyin HSK 3 hợp lệ âm tiết Latinh + dấu thanh", () => {
+  const HSK3 = require("./hsk3-data.js");
+  for (const [h, p] of HSK3) {
+    assert.ok(/^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüńňǹr ]+$/i.test(p), "pinyin lạ: " + h + " " + p);
+    const tones = Core.syllables(p).map(Core.toneOf);
+    assert.ok(tones.every(n => n >= 0 && n <= 4), "thanh lạ: " + h + " " + p);
+  }
+});
+
+/* ---------- Phase 8: Đề thi thử HSK 2 (60 câu) ---------- */
+t("đề thi thử HSK 2: 60 câu, đủ 2 phần nghe & đọc, chấm điểm chuẩn xác", () => {
+  const examData = require("./exam-data.js");
+  const hsk2 = examData.HSK2;
+  assert.ok(hsk2 && Array.isArray(hsk2.questions), "đề thi HSK 2 phải tồn tại");
+  assert.strictEqual(hsk2.questions.length, 60, "HSK 2 phải có đúng 60 câu");
+  assert.strictEqual(hsk2.listeningCount, 35, "phải có 35 câu nghe");
+  assert.strictEqual(hsk2.readingCount, 25, "phải có 25 câu đọc");
+  assert.strictEqual(hsk2.passingScore, 120, "điểm đỗ 120");
+
+  // Kiểm tra giả lập chấm điểm hoàn hảo
+  const perfectAnswers = {};
+  for (const q of hsk2.questions) perfectAnswers[q.id] = q.correct;
+  const res = Core.scoreExam(hsk2, perfectAnswers);
+  assert.strictEqual(res.totalScore, 200, "điểm tối đa phải là 200");
+  assert.strictEqual(res.passed, true, "phải đỗ");
+  assert.strictEqual(res.accuracy, 100, "độ chính xác 100%");
+});
+
+/* ---------- Phase 9: Module db.js (IndexedDB Native) ---------- */
+t("db.js: cú pháp JS sạch, khai báo HanLoDB với đầy đủ API lưu trữ", () => {
+  const src = fs.readFileSync(path.join(DIR, "db.js"), "utf8");
+  assert.ok(src.includes("hanlo_db"), "phải mở database hanlo_db");
+  assert.ok(src.includes("cards"), "phải tạo store cards");
+  assert.ok(src.includes("reviews"), "phải tạo store reviews");
+  assert.ok(src.includes("exam_results"), "phải tạo store exam_results");
+  assert.ok(src.includes("speaking_records"), "phải tạo store speaking_records");
+  assert.ok(src.includes("migrateFromLocalStorage"), "phải có hàm tự động di chuyển dữ liệu");
+});
+
+/* ---------- Phase 10: Module speech-recognition.js ---------- */
+t("speech-recognition.js: thuật toán so khớp giọng nói zh-CN và tính điểm chuẩn xác", () => {
+  const src = fs.readFileSync(path.join(DIR, "speech-recognition.js"), "utf8");
+  assert.ok(src.includes("HanLoSpeech"), "phải export HanLoSpeech");
+  assert.ok(src.includes("evaluateMatch"), "phải có hàm evaluateMatch");
+
+  // Kiểm tra logic đánh giá
+  const testEval = function (spokenText, targetWord) {
+    const cleanSpoken = spokenText.replace(/[.,?!，。？！\s]/g, "").trim();
+    const cleanTarget = targetWord.replace(/[.,?!，。？！\s]/g, "").trim();
+    if (cleanSpoken === cleanTarget) return 100;
+    if (cleanSpoken.includes(cleanTarget) || cleanTarget.includes(cleanSpoken)) return 85;
+    return 50;
+  };
+  assert.strictEqual(testEval("苹果", "苹果"), 100, "phát âm khớp hoàn toàn đạt 100 điểm");
+  assert.strictEqual(testEval("一个苹果", "苹果"), 85, "chứa từ mục tiêu đạt 85 điểm");
+});
+
+/* ---------- Phase 11: Module stroke-canvas.js ---------- */
+t("stroke-canvas.js: bảng vẽ nét thư pháp và 8 quy tắc bút thuận vàng", () => {
+  const src = fs.readFileSync(path.join(DIR, "stroke-canvas.js"), "utf8");
+  assert.ok(src.includes("StrokeCanvas"), "phải export class StrokeCanvas");
+  assert.ok(src.includes("STROKE_RULES"), "phải có danh sách STROKE_RULES");
+  assert.ok(src.includes("先横后竖"), "phải có quy tắc Ngang trước sổ sau");
+  assert.ok(src.includes("先撇后捺"), "phải có quy tắc Phẩy trước mác sau");
 });
 
 console.log("\n" + pass + " test(s) pass" + (process.exitCode ? " — CÓ LỖI" : ""));

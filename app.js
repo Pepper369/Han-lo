@@ -8,6 +8,9 @@
   (window.HSK2 || []).forEach(function (row, i) {
     ALL_WORDS.push({ id: 300 + i, level: 2, h: row[0], p: row[1], hv: row[2], vi: row[3] });
   });
+  (window.HSK3 || []).forEach(function (row, i) {
+    ALL_WORDS.push({ id: 500 + i, level: 3, h: row[0], p: row[1], hv: row[2], vi: row[3] });
+  });
 
   var LESSON_SIZE = 10;
   var currentLvl = "1";
@@ -21,6 +24,8 @@
       WORDS = ALL_WORDS.filter(function (w) { return w.level === 1; });
     } else if (currentLvl === "2") {
       WORDS = ALL_WORDS.filter(function (w) { return w.level === 2; });
+    } else if (currentLvl === "3") {
+      WORDS = ALL_WORDS.filter(function (w) { return w.level === 3; });
     } else {
       WORDS = ALL_WORDS.slice();
     }
@@ -41,7 +46,8 @@
     if (subEl) {
       if (currentLvl === "1") subEl.textContent = "HSK 1 · 300 từ";
       else if (currentLvl === "2") subEl.textContent = "HSK 2 · 200 từ";
-      else subEl.textContent = "HSK 1+2 · 500 từ";
+      else if (currentLvl === "3") subEl.textContent = "HSK 3 · 300 từ";
+      else subEl.textContent = "HSK 1+2+3 · 800 từ";
     }
 
     document.querySelectorAll(".level-pill").forEach(function (btn) {
@@ -86,12 +92,18 @@
     } catch (e) { return d; }
   }
   var S = load();
+  if (window.HanLoDB && HanLoDB.isSupported) {
+    HanLoDB.init().catch(function () {});
+  }
   setLevel(S.settings.level || "1");
 
   function save() {
     try {
       localStorage.setItem(KEY, JSON.stringify(S));
       if (window.SoundFX) SoundFX.enabled = S.settings.sfx !== false;
+      if (window.HanLoDB && HanLoDB.isSupported) {
+        HanLoDB.put("settings", Object.assign({ key: "main_settings" }, S.settings)).catch(function () {});
+      }
     } catch (e) { /* chế độ riêng tư: bỏ qua */ }
   }
   function todayFresh() {
@@ -215,6 +227,7 @@
     else if (view === "phonics") renderPhonics();
     else if (view === "grammar") renderGrammar();
     else if (view === "reader") renderReader();
+    else if (view === "speech") renderSpeech();
     else if (view === "dict") renderDictList();
     else if (view === "write") renderWrite();
     else renderProgress();
@@ -289,10 +302,15 @@
             '<h4>Ngữ Âm Pinyin</h4>' +
             '<p>23 thanh mẫu, 36 vận mẫu &amp; 4 thanh điệu.</p>' +
           '</div>' +
+          '<div class="bento-card" data-nav="speech">' +
+            '<span class="bento-icon">🎙️</span>' +
+            '<h4>Luyện Nói zh-CN</h4>' +
+            '<p>Web Speech AI chấm điểm phát âm trực tiếp.</p>' +
+          '</div>' +
           '<div class="bento-card" data-nav="reader">' +
             '<span class="bento-icon">📖</span>' +
             '<h4>Đọc Tương Tác</h4>' +
-            '<p>Bài đọc HSK ngắn, ẩn/hiện Pinyin, tra từ 1-chạm.</p>' +
+            '<p>Bài đọc ngắn, ẩn/hiện Pinyin, tra từ 1-chạm.</p>' +
           '</div>' +
           '<div class="bento-card" data-nav="grammar">' +
             '<span class="bento-icon">⚖️</span>' +
@@ -301,14 +319,14 @@
           '</div>' +
           '<div class="bento-card" data-nav="exam">' +
             '<span class="bento-icon">📝</span>' +
-            '<h4>Thi Thử HSK 1</h4>' +
-            '<p>Đề chuẩn 40 câu / 35 phút, đếm giờ, chấm điểm.</p>' +
+            '<h4>Thi Thử HSK 1 &amp; 2</h4>' +
+            '<p>Đề chuẩn 40–60 câu, đếm giờ, chấm điểm.</p>' +
           '</div>' +
         '</div>' +
       "</section>" +
 
       '<section class="card">' +
-        '<div class="row-between"><h3>Tiến độ ' + (currentLvl === "1" ? "HSK 1" : currentLvl === "2" ? "HSK 2" : "HSK 1+2") + '</h3><span class="muted">' + learned + "/" + WORDS.length + " từ</span></div>" +
+        '<div class="row-between"><h3>Tiến độ ' + (currentLvl === "1" ? "HSK 1" : currentLvl === "2" ? "HSK 2" : currentLvl === "3" ? "HSK 3" : "HSK 1+2+3") + '</h3><span class="muted">' + learned + "/" + WORDS.length + " từ</span></div>" +
         '<div class="bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="Tiến độ từ vựng">' +
           '<i style="width:' + pct + '%"></i></div>' +
         '<div class="legend">' +
@@ -349,26 +367,30 @@
     $("#view-exam").innerHTML =
       '<section class="card exam-intro">' +
         '<div class="eyebrow">Chuẩn CTI / HSK 3.0</div>' +
-        '<h2>Thi Thử HSK 1 Chuẩn Quốc Tế</h2>' +
-        '<p class="muted">Bộ đề chuẩn 40 câu trắc nghiệm mô phỏng đúng 100% cấu trúc phòng thi thật: đồng hồ đếm ngược, audio phát âm zh-CN, tự động chấm điểm và phân tích kỹ năng.</p>' +
+        '<h2>Thi Thử HSK Chuẩn Quốc Tế</h2>' +
+        '<p class="muted">Bộ đề trắc nghiệm chuẩn mô phỏng đúng 100% cấu trúc phòng thi thật: đồng hồ đếm ngược, audio phát âm zh-CN, tự động chấm điểm và phân tích kỹ năng.</p>' +
         '<div class="exam-badge-row">' +
-          '<span class="exam-tag">⏱️ 35 phút</span>' +
-          '<span class="exam-tag">📝 40 câu hỏi</span>' +
+          '<span class="exam-tag">⏱️ 35 – 55 phút</span>' +
+          '<span class="exam-tag">📝 40 – 60 câu</span>' +
           '<span class="exam-tag">🎯 Đạt: ≥ 120 / 200 điểm</span>' +
           '<span class="exam-tag">🔊 Giọng đọc zh-CN</span>' +
         '</div>' +
         '<ul class="exam-rule-list muted">' +
-          '<li><b>Phần 1 — Nghe hiểu (听力):</b> 20 câu (Câu 1–20), bấm nút loa để nghe giọng chuẩn zh-CN và chọn đáp án.</li>' +
-          '<li><b>Phần 2 — Đọc hiểu (阅读):</b> 20 câu (Câu 21–40), kiểm tra từ vựng, ngữ pháp và đối thoại.</li>' +
-          '<li>Hệ thống tự động nộp bài khi hết 35 phút hoặc bạn có thể nộp sớm bất kỳ lúc nào.</li>' +
+          '<li><b>Phần 1 — Nghe hiểu (听力):</b> Nghe phát âm chuẩn zh-CN và chọn đáp án đúng.</li>' +
+          '<li><b>Phần 2 — Đọc hiểu (阅读):</b> Kiểm tra từ vựng, ngữ pháp, điền từ và đọc hiểu đối thoại.</li>' +
+          '<li>Hệ thống tự động chấm điểm và lưu lịch sử thi chi tiết.</li>' +
         '</ul>' +
-        '<button class="btn primary wide" data-act="start-exam" style="padding:15px; font-size:16px; font-weight:600">Bắt đầu làm bài thi</button>' +
+        '<div style="display:flex; flex-direction:column; gap:12px; margin: 18px 0 10px;">' +
+          '<button class="btn primary wide" data-act="start-exam-1" style="padding:14px; font-size:15px; font-weight:600">🎯 Thi Thử HSK 1 (40 câu / 35 phút)</button>' +
+          '<button class="btn ghost wide" data-act="start-exam-2" style="padding:14px; font-size:15px; font-weight:600">🚀 Thi Thử HSK 2 (60 câu / 55 phút)</button>' +
+        '</div>' +
         histHtml +
       '</section>';
   }
 
-  function startExam() {
-    var exam = window.HSK1_EXAM_PRACTICE;
+  function startExam(level) {
+    var lvl = level === 2 ? 2 : 1;
+    var exam = (window.HSK_EXAMS && window.HSK_EXAMS[lvl]) || (lvl === 2 ? window.HSK2_EXAM_PRACTICE : window.HSK1_EXAM_PRACTICE);
     if (!exam || !exam.questions || !exam.questions.length) {
       toast("Đang tải dữ liệu đề thi...");
       return;
@@ -791,6 +813,131 @@
     $("#lookupSheet").classList.add("hidden");
   }
 
+  /* ================= luyện nói & chấm phát âm zh-CN ================= */
+  var speechWordIdx = 0;
+  var speechResult = null;
+
+  function renderSpeech() {
+    var list = WORDS.length ? WORDS : ALL_WORDS;
+    var word = list[speechWordIdx % list.length];
+
+    var micStatusHtml = "";
+    if (window.HanLoSpeech && HanLoSpeech.isListening) {
+      micStatusHtml = '<div class="speech-status listening"><span class="pulse-ring"></span> Đang lắng nghe giọng bạn... Hãy đọc to rõ chữ Hán!</div>';
+    } else if (speechResult) {
+      var passCls = speechResult.passed ? "pass" : "fail";
+      micStatusHtml = '<div class="speech-result-card ' + passCls + '">' +
+        '<div class="score-tag">' + speechResult.score + '% · ' + esc(speechResult.grade) + '</div>' +
+        '<div class="speech-detail">Bạn đã nói: <b>' + (esc(speechResult.text) || "(Chưa rõ âm)") + '</b></div>' +
+        '</div>';
+    } else {
+      micStatusHtml = '<p class="muted small center" style="margin-top:12px">Nhấn nút Micro và đọc to chữ Hán để máy chấm điểm phát âm.</p>';
+    }
+
+    $("#view-speech").innerHTML =
+      '<div class="row-between" style="margin-bottom:14px">' +
+        '<div>' +
+          '<p class="eyebrow">Web Speech AI · zh-CN</p>' +
+          '<h2 style="margin:2px 0">Luyện Nói &amp; Chấm Phát Âm</h2>' +
+        '</div>' +
+        '<button class="btn ghost small" data-nav="home">← Trang chủ</button>' +
+      '</div>' +
+
+      '<section class="card speech-practice-card">' +
+        '<div class="speech-target-box">' +
+          '<div class="speech-target-char">' + esc(word.h) + '</div>' +
+          '<div class="speech-target-pinyin">' + pinyinHTML(word.p) + '</div>' +
+          '<div class="speech-target-hv">Âm Hán-Việt: <b>' + esc(word.hv.toUpperCase()) + '</b></div>' +
+          '<div class="speech-target-vi">Nghĩa: ' + esc(word.vi) + '</div>' +
+          '<button class="audio-listen-btn" data-act="speech-tts" data-word="' + esc(word.h) + '">' +
+            '🔊 Nghe phát âm mẫu' +
+          '</button>' +
+        '</div>' +
+
+        '<div class="speech-mic-area">' +
+          '<button class="mic-action-btn' + (window.HanLoSpeech && HanLoSpeech.isListening ? ' recording' : '') + '" data-act="speech-mic" aria-label="Bật mic nói">' +
+            '<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>' +
+              '<path d="M19 10v2a7 7 0 0 1-14 0v-2"/>' +
+              '<line x1="12" y1="19" x2="12" y2="23"/>' +
+              '<line x1="8" y1="23" x2="16" y2="23"/>' +
+            '</svg>' +
+          '</button>' +
+          micStatusHtml +
+        '</div>' +
+
+        '<div class="speech-nav-row">' +
+          '<button class="btn ghost" data-act="speech-prev">← Từ trước</button>' +
+          '<span class="muted small">Từ ' + ((speechWordIdx % list.length) + 1) + ' / ' + list.length + '</span>' +
+          '<button class="btn primary" data-act="speech-next">Từ tiếp theo →</button>' +
+        '</div>' +
+      '</section>';
+  }
+
+  function toggleSpeechMic() {
+    if (!window.HanLoSpeech || !HanLoSpeech.isSupported) {
+      toast("Trình duyệt không hỗ trợ Web Speech API (Hãy dùng Chrome hoặc Edge)");
+      return;
+    }
+    var list = WORDS.length ? WORDS : ALL_WORDS;
+    var word = list[speechWordIdx % list.length];
+
+    if (HanLoSpeech.isListening) {
+      HanLoSpeech.stopListening();
+      renderSpeech();
+      return;
+    }
+
+    speechResult = null;
+    HanLoSpeech.startListening(
+      word.h,
+      function onResult(res) {
+        speechResult = res;
+        if (window.SoundFX) {
+          if (res.score >= 80) SoundFX.bell();
+          else if (res.score >= 50) SoundFX.tap();
+          else SoundFX.wrong();
+        }
+        if (window.HanLoDB && HanLoDB.isSupported) {
+          HanLoDB.put("speaking_records", {
+            word: word.h,
+            pinyin: word.p,
+            score: res.score,
+            spoken: res.text,
+            timestamp: new Date().toISOString()
+          }).catch(function(){});
+        }
+        renderSpeech();
+      },
+      function onError(err) {
+        toast("Nhận diện âm thanh: " + (err || "Hãy thử lại"));
+        renderSpeech();
+      },
+      function onStart() {
+        if (window.SoundFX) SoundFX.tap();
+        renderSpeech();
+      },
+      function onEnd() {
+        renderSpeech();
+      }
+    );
+  }
+
+  /* ================= virtual stroke canvas ================= */
+  var activeStrokeCanvas = null;
+
+  function initVirtualCanvas(char) {
+    var host = $("#stroke-canvas-container");
+    if (!host || typeof StrokeCanvas === "undefined") return;
+    activeStrokeCanvas = new StrokeCanvas(host, {
+      size: Math.min(320, window.innerWidth - 48),
+      watermarkChar: char || "永",
+      gridType: "mi",
+      inkColor: "#1c1917",
+      lineWidth: 8
+    });
+  }
+
   /* ================= sao lưu & phục hồi tiến độ ================= */
   function exportBackup() {
     if (window.SoundFX) SoundFX.tap();
@@ -892,6 +1039,30 @@
     var total = WORDS.length;
     var seg = function (n, cls) { return '<i class="' + cls + '" style="width:' + (n / total) * 100 + '%"></i>'; };
 
+    // Study Heatmap 52 tuần (364 ngày)
+    var heatCells = "";
+    var nowMs = Date.now();
+    for (var hi = 363; hi >= 0; hi--) {
+      var dTime = nowMs - hi * 86400000;
+      var dKey = Core.dayKey(dTime);
+      var rec = S.history[dKey];
+      var cnt = rec ? rec.n : 0;
+      var lvl = cnt === 0 ? 0 : cnt <= 5 ? 1 : cnt <= 15 ? 2 : cnt <= 30 ? 3 : 4;
+      heatCells += '<div class="heat-cell heat-' + lvl + '" title="' + dKey + ': ' + cnt + ' lượt ôn"></div>';
+    }
+
+    // Memory Matrix (4 cấp độ củng cố trí nhớ SM-2)
+    var m1 = 0, m2 = 0, m3 = 0, m4 = 0;
+    Object.keys(S.cards).forEach(function (k) {
+      var c = S.cards[k];
+      if (!c) return;
+      var iv = c.interval || 0;
+      if (iv <= 1) m1++;
+      else if (iv <= 6) m2++;
+      else if (iv <= 20) m3++;
+      else m4++;
+    });
+
     $("#view-progress").innerHTML =
       '<section class="stat-grid">' +
         '<div class="card stat"><b>' + st.learned + "</b><span>Đã học</span></div>" +
@@ -901,7 +1072,17 @@
       "</section>" +
 
       '<section class="card">' +
-        "<h3>Phân bố 300 từ</h3>" +
+        '<div class="row-between"><h3>Ma Trận Trí Nhớ (SM-2)</h3><span class="muted small">Độ bền hồi tưởng</span></div>' +
+        '<div class="matrix-grid">' +
+          '<div class="matrix-card"><b>' + m1 + '</b><span>Mới tiếp nhận (≤ 1 ngày)</span></div>' +
+          '<div class="matrix-card"><b>' + m2 + '</b><span>Củng cố ngắn (2–6 ngày)</span></div>' +
+          '<div class="matrix-card"><b>' + m3 + '</b><span>Vững chắc (7–20 ngày)</span></div>' +
+          '<div class="matrix-card"><b>' + m4 + '</b><span>Trí nhớ dài hạn (&gt; 20 ngày)</span></div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="card">' +
+        "<h3>Phân bố " + total + " từ (" + (currentLvl === "1" ? "HSK 1" : currentLvl === "2" ? "HSK 2" : currentLvl === "3" ? "HSK 3" : "Tất cả") + ")</h3>" +
         '<div class="seg">' +
           seg(total - st.learned, "s-new") + seg(st.learning, "s-learning") +
           seg(st.review, "s-review") + seg(st.mastered, "s-mastered") +
@@ -915,6 +1096,23 @@
       "</section>" +
 
       '<section class="card">' +
+        '<div class="row-between"><h3>Bản Đồ Hoạt Động (52 Tuần)</h3><span class="muted small">Phong cách GitHub</span></div>' +
+        '<p class="muted small">Mật độ ôn tập và củng cố từ vựng trong 365 ngày qua.</p>' +
+        '<div class="heatmap-wrap">' +
+          '<div class="heatmap-grid">' + heatCells + '</div>' +
+        '</div>' +
+        '<div class="legend" style="margin-top:8px;justify-content:flex-end;gap:6px">' +
+          '<span class="muted small">Ít</span>' +
+          '<span class="heat-cell heat-0"></span>' +
+          '<span class="heat-cell heat-1"></span>' +
+          '<span class="heat-cell heat-2"></span>' +
+          '<span class="heat-cell heat-3"></span>' +
+          '<span class="heat-cell heat-4"></span>' +
+          '<span class="muted small">Nhiều</span>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="card">' +
         "<h3>14 ngày gần đây</h3>" +
         '<div class="chart">' + bars + "</div>" +
         '<p class="muted small">Số lượt trả lời mỗi ngày.</p>' +
@@ -925,7 +1123,7 @@
         '<div class="bar"><i style="width:' + acc + '%"></i></div>' +
       "</section>" +
 
-      '<p class="muted small center">Dữ liệu HSK 1 (HSK 3.0) · pinyin + Hán–Việt + nghĩa tiếng Việt · lưu trên máy.</p>';
+      '<p class="muted small center">Hán Lộ HSK 3.0 · PWA Offline-First · Lưu trữ an toàn trên thiết bị.</p>';
   }
 
   /* ================= phiên học ================= */
@@ -1170,11 +1368,58 @@
     var list = writeFilter === "all" ? CHARS : CHARS.filter(charKnown);
     if (!list.length) {
       $("#char-grid").innerHTML = '<p class="muted empty">Chưa có chữ nào. Học vài từ trước nhé.</p>';
-      return;
+    } else {
+      $("#char-grid").innerHTML = list.map(function (ch) {
+        return '<button class="char-btn' + (charKnown(ch) ? " learned" : "") + '" data-wchar="' + ch + '" aria-label="Tập viết ' + ch + '">' + ch + "</button>";
+      }).join("");
     }
-    $("#char-grid").innerHTML = list.map(function (ch) {
-      return '<button class="char-btn' + (charKnown(ch) ? " learned" : "") + '" data-wchar="' + ch + '" aria-label="Tập viết ' + ch + '">' + ch + "</button>";
-    }).join("");
+
+    var canvasSection = $("#virtual-canvas-section");
+    if (canvasSection) {
+      var rulesHtml = (window.STROKE_RULES || []).map(function (r, idx) {
+        return '<div class="rule-item">' +
+          '<span class="rule-num">' + (idx + 1) + '</span>' +
+          '<div style="flex:1">' +
+            '<div><b>' + esc(r.title) + '</b> <span class="muted">(' + esc(r.zh) + ')</span></div>' +
+            '<div class="small muted">' + esc(r.desc) + ' · Ví dụ: <b style="color:var(--jade)">' + esc(r.example) + '</b></div>' +
+          '</div>' +
+        '</div>';
+      }).join("");
+
+      canvasSection.innerHTML =
+        '<section class="card">' +
+          '<div class="row-between">' +
+            '<div>' +
+              '<p class="eyebrow">Offline-First · HTML5 Canvas</p>' +
+              '<h3 style="margin:2px 0">Bảng Viết Thư Pháp Tự Do</h3>' +
+            '</div>' +
+            '<span class="badge s-mastered">Lưới Mễ (米)</span>' +
+          '</div>' +
+          '<p class="muted small">Luyện viết tự do với mực thư pháp biến thiên nét thanh nét đậm, không cần kết nối mạng.</p>' +
+          '<div class="canvas-wrap">' +
+            '<div id="stroke-canvas-container"></div>' +
+            '<div class="canvas-tools-row">' +
+              '<button class="color-dot active" data-act="canvas-color" data-color="#1c1917" style="background:#1c1917" title="Mực tàu đen"></button>' +
+              '<button class="color-dot" data-act="canvas-color" data-color="#b91c1c" style="background:#b91c1c" title="Son đỏ hoàng triều"></button>' +
+              '<button class="color-dot" data-act="canvas-color" data-color="#0f766e" style="background:#0f766e" title="Ngọc bích"></button>' +
+              '<button class="btn ghost small" data-act="canvas-undo">↩ Hoàn tác</button>' +
+              '<button class="btn ghost small" data-act="canvas-clear">🗑️ Xóa hết</button>' +
+            '</div>' +
+          '</div>' +
+        '</section>' +
+
+        '<section class="card stroke-rules-card">' +
+          '<div class="row-between">' +
+            '<h3>8 Quy Tắc Bút Thuận Vàng</h3>' +
+            '<span class="muted small">Quy tắc viết chữ Hán</span>' +
+          '</div>' +
+          '<div style="margin-top:12px">' + rulesHtml + '</div>' +
+        '</section>';
+
+      setTimeout(function () {
+        initVirtualCanvas("永");
+      }, 50);
+    }
   }
   function openWriter(ch) {
     writeChar = ch;
@@ -1338,7 +1583,39 @@
     if (act === "close-write") { closeWriter(); return; }
     if (act === "write-animate") { if (writer) writer.animateCharacter(); return; }
     if (act === "write-quiz") { quizWriter(); return; }
-    if (act === "start-exam") { startExam(); return; }
+    if (act === "start-exam-1" || act === "start-exam") { startExam(1); return; }
+    if (act === "start-exam-2") { startExam(2); return; }
+    if (act === "speech-mic") { toggleSpeechMic(); return; }
+    if (act === "speech-prev") {
+      if (speechWordIdx > 0) speechWordIdx--;
+      speechResult = null;
+      renderSpeech();
+      return;
+    }
+    if (act === "speech-next") {
+      speechWordIdx++;
+      speechResult = null;
+      renderSpeech();
+      return;
+    }
+    if (act === "speech-tts") { speak(el.dataset.word); return; }
+    if (act === "canvas-clear") {
+      if (activeStrokeCanvas) activeStrokeCanvas.clear();
+      return;
+    }
+    if (act === "canvas-undo") {
+      if (activeStrokeCanvas) activeStrokeCanvas.undo();
+      return;
+    }
+    if (act === "canvas-color") {
+      if (activeStrokeCanvas) {
+        activeStrokeCanvas.setInkColor(el.dataset.color);
+        document.querySelectorAll("[data-act='canvas-color']").forEach(function (b) {
+          b.classList.toggle("active", b.dataset.color === el.dataset.color);
+        });
+      }
+      return;
+    }
     if (act === "quit-exam") {
       closeExamSession();
       return;
