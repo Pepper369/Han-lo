@@ -173,4 +173,100 @@ t("dayKey dạng YYYY-MM-DD, lùi 1 ngày", () => {
   assert.strictEqual(b, a);
 });
 
+/* ---------- Đề thi thử HSK 1 ---------- */
+t("đề thi thử HSK 1: 40 câu, đủ 2 phần nghe & đọc, chấm điểm chuẩn xác", () => {
+  const exam = require("./exam-data.js");
+  assert.strictEqual(exam.questions.length, 40);
+  assert.strictEqual(exam.questions.filter(q => q.section === "listening").length, 20);
+  assert.strictEqual(exam.questions.filter(q => q.section === "reading").length, 20);
+
+  // Giả lập làm đúng 24 câu (12 nghe + 12 đọc) -> 120 điểm (Đỗ chuẩn mốc)
+  const answers = {};
+  exam.questions.forEach((q, idx) => {
+    if (idx < 24) answers[q.id] = q.correct;
+    else answers[q.id] = "wrong_dummy_answer";
+  });
+  const res = Core.scoreExam(exam, answers);
+  assert.strictEqual(res.totalCorrect, 24);
+  assert.strictEqual(res.totalScore, 120);
+  assert.strictEqual(res.passed, true);
+  assert.strictEqual(res.accuracy, 60);
+});
+
+/* ---------- Phase 3: Âm thanh cổ điển Web Audio Synthesizer ---------- */
+t("audio-fx.js: cú pháp JS sạch, chứa Web Audio synthesizer cho phách gỗ, khánh ngọc, chuông thiền", () => {
+  const src = fs.readFileSync(path.join(DIR, "audio-fx.js"), "utf8");
+  assert.ok(src.includes("AudioContext"), "phải dùng Web Audio API");
+  assert.ok(src.includes("tap"), "phải có hiệu ứng tap phách gỗ");
+  assert.ok(src.includes("correct"), "phải có hiệu ứng correct khánh ngọc");
+  assert.ok(src.includes("wrong"), "phải có hiệu ứng wrong");
+  assert.ok(src.includes("zenBell"), "phải có hiệu ứng zenBell chuông thiền");
+  assert.ok(src.includes("gong"), "phải có hiệu ứng gong chiêng đồng");
+});
+
+/* ---------- Phase 4: Ngữ âm Pinyin & Tone Curves ---------- */
+t("phonics-data.js: 5 thanh điệu (4 chính + 1 khinh thanh kèm SVG curve), 23 thanh mẫu, 36 vận mẫu", () => {
+  const pData = require("./phonics-data.js");
+  assert.strictEqual(pData.tones.length, 5, "phải có 5 thanh điệu (4 chính + 1 khinh thanh)");
+  for (const t of pData.tones) {
+    assert.ok(t.mark && t.pitch && t.name && t.curvePath && t.tipViet && t.exampleHz, "tone thiếu thuộc tính: " + t.name);
+    assert.ok(t.curvePath.startsWith("M "), "curvePath phải là đường dẫn SVG hợp lệ: " + t.curvePath);
+  }
+  assert.strictEqual(pData.initials.length, 23, "phải có 23 thanh mẫu (Shengmu)");
+  assert.strictEqual(pData.finals.length, 36, "phải có 36 vận mẫu (Yunmu)");
+  assert.ok(pData.rules.length >= 3, "phải có ít nhất 3 quy tắc biến điệu cốt lõi");
+});
+
+/* ---------- Phase 5: Sắc thái từ vựng & Cấu trúc ngữ pháp ---------- */
+t("grammar-data.js: các cặp so sánh sắc thái kinh điển & cấu trúc câu trọng điểm HSK 1-2", () => {
+  const gData = require("./grammar-data.js");
+  assert.ok(Array.isArray(gData.nuances) && gData.nuances.length >= 4, "phải có ít nhất 4 cặp so sánh sắc thái");
+  for (const item of gData.nuances) {
+    assert.ok(item.title && item.summary && Array.isArray(item.items), "nuance thiếu thuộc tính");
+    for (const card of item.items) {
+      assert.ok(card.word && card.role && Array.isArray(card.examples) && card.examples.length > 0, "card ngữ pháp thiếu dữ liệu ví dụ");
+    }
+  }
+  assert.ok(Array.isArray(gData.structures) && gData.structures.length >= 3, "phải có ít nhất 3 cấu trúc câu trọng điểm");
+});
+
+/* ---------- Phase 6: Trình đọc tương tác & Tra nghĩa tức thì ---------- */
+t("reader-data.js: bài đọc phân cấp, bọc token đầy đủ pinyin, âm Hán-Việt và nghĩa", () => {
+  const rData = require("./reader-data.js");
+  assert.ok(Array.isArray(rData) && rData.length >= 3, "phải có ít nhất 3 bài đọc HSK");
+  for (const art of rData) {
+    assert.ok(art.id && art.title && art.titleVi && art.level && Array.isArray(art.paragraphs), "bài đọc thiếu thông tin");
+    for (const p of art.paragraphs) {
+      assert.ok(p.audioText, "đoạn văn phải có audioText để đọc mẫu");
+      for (const sent of p.sentences) {
+        for (const tok of sent.tokens) {
+          assert.ok(tok.h, "token phải có chữ Hán h");
+          if (!tok.isPunc) {
+            assert.ok(tok.p && tok.hv && tok.vi, "từ vựng phải có pinyin, Hán-Việt, và nghĩa tiếng Việt: " + tok.h);
+          }
+        }
+      }
+    }
+  }
+});
+
+/* ---------- Kiểm tra tính đồng bộ DOM và Cú pháp ---------- */
+t("index.html & app.js: đồng bộ đầy đủ các view, modal lookup và cài đặt mới", () => {
+  const html = fs.readFileSync(path.join(DIR, "index.html"), "utf8");
+  assert.ok(html.includes('id="view-phonics"'), "thiếu container #view-phonics");
+  assert.ok(html.includes('id="view-grammar"'), "thiếu container #view-grammar");
+  assert.ok(html.includes('id="view-reader"'), "thiếu container #view-reader");
+  assert.ok(html.includes('id="lookupSheet"'), "thiếu modal #lookupSheet");
+  assert.ok(html.includes('id="set-sfx"'), "thiếu cài đặt âm thanh #set-sfx");
+  assert.ok(html.includes('id="import-file-input"'), "thiếu input khôi phục #import-file-input");
+
+  const appJs = fs.readFileSync(path.join(DIR, "app.js"), "utf8");
+  assert.ok(appJs.includes("renderPhonics"), "thiếu hàm renderPhonics");
+  assert.ok(appJs.includes("renderGrammar"), "thiếu hàm renderGrammar");
+  assert.ok(appJs.includes("renderReader"), "thiếu hàm renderReader");
+  assert.ok(appJs.includes("openLookup"), "thiếu hàm openLookup");
+  assert.ok(appJs.includes("exportBackup"), "thiếu hàm exportBackup");
+  assert.ok(appJs.includes("importBackup"), "thiếu hàm importBackup");
+});
+
 console.log("\n" + pass + " test(s) pass" + (process.exitCode ? " — CÓ LỖI" : ""));

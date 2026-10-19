@@ -78,10 +78,19 @@
     <div class="char-grid" id="char-grid"></div>
   </main>
 
+  <main id="view-exam" class="view hidden"></main>
+  <main id="view-phonics" class="view hidden"></main>
+  <main id="view-grammar" class="view hidden"></main>
+  <main id="view-reader" class="view hidden"></main>
+
   <nav class="tabbar" aria-label="Điều hướng chính">
     <button class="tab active" data-nav="home">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-1.7-1.5-3.8-2-8-2v12c4.2 0 6.3.5 8 2 1.7-1.5 3.8-2 8-2V5c-4.2 0-6.3.5-8 2z"/><path d="M12 7v12"/></svg>
       <span>Học</span>
+    </button>
+    <button class="tab" data-nav="exam">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Thi thử</span>
     </button>
     <button class="tab" data-nav="dict">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
@@ -99,6 +108,7 @@
 </div>
 
 <section id="session" class="session hidden" aria-live="polite"></section>
+<section id="exam-session" class="session exam-session hidden" aria-live="polite"></section>
 
 <div id="settings" class="sheet hidden" role="dialog" aria-modal="true" aria-labelledby="set-title">
   <div class="sheet-card">
@@ -108,6 +118,7 @@
     </div>
     <label class="set-row"><span>Hiện pinyin khi học</span><input type="checkbox" id="set-pinyin"></label>
     <label class="set-row"><span>Âm thanh (giọng đọc máy)</span><input type="checkbox" id="set-audio"></label>
+    <label class="set-row"><span>Hiệu ứng âm thanh (khánh ngọc)</span><input type="checkbox" id="set-sfx" checked></label>
     <label class="set-row"><span>Mục tiêu từ mới / ngày</span>
       <select id="set-goal">
         <option value="5">5 từ</option>
@@ -116,16 +127,30 @@
         <option value="20">20 từ</option>
       </select>
     </label>
+    <div style="display:flex;gap:8px;margin:12px 0">
+      <button class="btn ghost small" data-act="export-backup" style="flex:1">💾 Sao lưu</button>
+      <button class="btn ghost small" data-act="import-backup-btn" style="flex:1">📂 Khôi phục</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none">
+    </div>
     <button class="btn ghost danger" data-act="reset">Xóa toàn bộ tiến độ</button>
     <div class="set-links">
       <a href="gioi-thieu.html">Giới thiệu HSK 3.0 &amp; cách học</a>
       <button class="link-btn" data-act="show-welcome">Xem lại màn hình chào</button>
     </div>
     <p class="muted small">
-      Dữ liệu HSK 1 (HSK 3.0, đề cương 2025) — 300 từ, pinyin, âm Hán–Việt, nghĩa tiếng Việt.
-      Tiến độ lưu trên máy này, không gửi đi đâu. Giọng đọc dùng giọng tiếng Trung có sẵn của trình duyệt/hệ điều hành;
-      nếu máy chưa có, hãy cài gói giọng zh-CN trong phần cài đặt ngôn ngữ của Windows/điện thoại.
+      Dữ liệu HSK 1 &amp; HSK 2 (HSK 3.0) — 500 từ, pinyin, âm Hán–Việt, nghĩa tiếng Việt.
+      Tiến độ lưu an toàn trên máy này. Hỗ trợ đầy đủ âm thanh khánh ngọc phương Đông và PWA offline 100%.
     </p>
+  </div>
+</div>
+
+<div id="lookupSheet" class="sheet center-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="lookup-title">
+  <div class="sheet-card write-card">
+    <div class="row-between">
+      <span class="badge s-mastered">Tra từ tức thì</span>
+      <button class="icon-btn" data-act="close-lookup" aria-label="Đóng">✕</button>
+    </div>
+    <div id="lookup-body" style="padding:14px 0 6px"></div>
   </div>
 </div>
 
@@ -147,9 +172,9 @@
 <div id="welcome" class="welcome hidden">
   <div class="welcome-card">
     <div class="brand-mark welcome-mark" aria-hidden="true">汉</div>
-    <p class="eyebrow">HSK 3.0 · 300 từ</p>
+    <p class="eyebrow">HSK 3.0 · 500 từ</p>
     <h1>Học tiếng Trung, mỗi ngày 15 phút</h1>
-    <p class="welcome-lede">Từ vựng HSK 1 theo chuẩn mới: phát âm, pinyin tô màu thanh điệu, âm Hán–Việt và ôn tập cách quãng.</p>
+    <p class="welcome-lede">Từ vựng HSK 1 &amp; HSK 2 theo chuẩn mới: phát âm, pinyin tô màu thanh điệu, âm Hán–Việt và ôn tập cách quãng.</p>
 
     <div class="welcome-block">
       <p class="eyebrow">Mục tiêu của bạn</p>
@@ -176,8 +201,13 @@
 
 <div id="toast" class="toast hidden" role="status"></div>
 
-<script src="data.js"></script>
-<script src="core.js"></script>
-<script src="app.js"></script>
+<script src="audio-fx.js?v=1.3.0"></script>
+<script src="data.js?v=1.3.0"></script>
+<script src="phonics-data.js?v=1.3.0"></script>
+<script src="grammar-data.js?v=1.3.0"></script>
+<script src="reader-data.js?v=1.3.0"></script>
+<script src="exam-data.js?v=1.3.0"></script>
+<script src="core.js?v=1.3.0"></script>
+<script src="app.js?v=1.3.0"></script>
 </body>
 </html>

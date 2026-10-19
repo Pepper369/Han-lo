@@ -70,5 +70,53 @@
     return !!card && card.due <= ts;
   }
 
-  return { DAY, toneOf, syllables, dayKey, prevDayKey, newCard, grade, stage, isDue };
+  // Chấm điểm bài thi thử HSK
+  function scoreExam(exam, userAnswers) {
+    const questions = exam.questions || [];
+    let listeningCorrect = 0;
+    let readingCorrect = 0;
+    const details = [];
+
+    for (const q of questions) {
+      const uAns = userAnswers[q.id];
+      const isCorrect = uAns !== undefined && uAns === q.correct;
+      if (isCorrect) {
+        if (q.section === "listening") listeningCorrect++;
+        else readingCorrect++;
+      }
+      details.push({
+        id: q.id,
+        section: q.section,
+        part: q.part,
+        isCorrect: isCorrect,
+        userAnswer: uAns,
+        correctAnswer: q.correct,
+        explanation: q.explanation
+      });
+    }
+
+    const listeningScore = listeningCorrect * 5; // 20 câu * 5đ = 100đ
+    const readingScore = readingCorrect * 5;     // 20 câu * 5đ = 100đ
+    const totalScore = listeningScore + readingScore; // 200đ
+    const passingScore = exam.passingScore || 120;
+    const passed = totalScore >= passingScore;
+    const totalCorrect = listeningCorrect + readingCorrect;
+    const accuracy = Math.round((totalCorrect / questions.length) * 100);
+
+    return {
+      totalQuestions: questions.length,
+      totalCorrect,
+      listeningCorrect,
+      readingCorrect,
+      listeningScore,
+      readingScore,
+      totalScore,
+      passingScore,
+      passed,
+      accuracy,
+      details
+    };
+  }
+
+  return { DAY, toneOf, syllables, dayKey, prevDayKey, newCard, grade, stage, isDue, scoreExam };
 });
