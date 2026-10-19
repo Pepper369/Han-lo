@@ -13,11 +13,12 @@
   function openDB() {
     return new Promise(function (resolve, reject) {
       if (dbInstance) return resolve(dbInstance);
-      if (!("indexedDB" in global)) {
+      const idb = (global && global.indexedDB) || (typeof window !== "undefined" && window.indexedDB) || (typeof indexedDB !== "undefined" ? indexedDB : null);
+      if (!idb) {
         return reject(new Error("Trình duyệt không hỗ trợ IndexedDB"));
       }
 
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      const req = idb.open(DB_NAME, DB_VERSION);
 
       req.onupgradeneeded = function (e) {
         const db = e.target.result;
@@ -54,7 +55,7 @@
   }
 
   const HanLoDB = {
-    isSupported: "indexedDB" in global,
+    isSupported: !!((global && global.indexedDB) || (typeof window !== "undefined" && window.indexedDB) || (typeof indexedDB !== "undefined")),
 
     init: async function () {
       try {

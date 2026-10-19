@@ -92,8 +92,8 @@
     } catch (e) { return d; }
   }
   var S = load();
-  if (window.HanLoDB && HanLoDB.isSupported) {
-    HanLoDB.init().catch(function () {});
+  if (typeof window !== "undefined" && window.HanLoDB && window.HanLoDB.isSupported) {
+    window.HanLoDB.init().catch(function () {});
   }
   setLevel(S.settings.level || "1");
 
@@ -101,8 +101,8 @@
     try {
       localStorage.setItem(KEY, JSON.stringify(S));
       if (window.SoundFX) SoundFX.enabled = S.settings.sfx !== false;
-      if (window.HanLoDB && HanLoDB.isSupported) {
-        HanLoDB.put("settings", Object.assign({ key: "main_settings" }, S.settings)).catch(function () {});
+      if (typeof window !== "undefined" && window.HanLoDB && window.HanLoDB.isSupported) {
+        window.HanLoDB.put("settings", Object.assign({ key: "main_settings" }, S.settings)).catch(function () {});
       }
     } catch (e) { /* chế độ riêng tư: bỏ qua */ }
   }
@@ -822,7 +822,7 @@
     var word = list[speechWordIdx % list.length];
 
     var micStatusHtml = "";
-    if (window.HanLoSpeech && HanLoSpeech.isListening) {
+    if (window.HanLoSpeech && window.HanLoSpeech.isListening) {
       micStatusHtml = '<div class="speech-status listening"><span class="pulse-ring"></span> Đang lắng nghe giọng bạn... Hãy đọc to rõ chữ Hán!</div>';
     } else if (speechResult) {
       var passCls = speechResult.passed ? "pass" : "fail";
@@ -855,7 +855,7 @@
         '</div>' +
 
         '<div class="speech-mic-area">' +
-          '<button class="mic-action-btn' + (window.HanLoSpeech && HanLoSpeech.isListening ? ' recording' : '') + '" data-act="speech-mic" aria-label="Bật mic nói">' +
+          '<button class="mic-action-btn' + (window.HanLoSpeech && window.HanLoSpeech.isListening ? ' recording' : '') + '" data-act="speech-mic" aria-label="Bật mic nói">' +
             '<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
               '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>' +
               '<path d="M19 10v2a7 7 0 0 1-14 0v-2"/>' +
@@ -875,21 +875,21 @@
   }
 
   function toggleSpeechMic() {
-    if (!window.HanLoSpeech || !HanLoSpeech.isSupported) {
+    if (!window.HanLoSpeech || !window.HanLoSpeech.isSupported) {
       toast("Trình duyệt không hỗ trợ Web Speech API (Hãy dùng Chrome hoặc Edge)");
       return;
     }
     var list = WORDS.length ? WORDS : ALL_WORDS;
     var word = list[speechWordIdx % list.length];
 
-    if (HanLoSpeech.isListening) {
-      HanLoSpeech.stopListening();
+    if (window.HanLoSpeech.isListening) {
+      window.HanLoSpeech.stopListening();
       renderSpeech();
       return;
     }
 
     speechResult = null;
-    HanLoSpeech.startListening(
+    window.HanLoSpeech.startListening(
       word.h,
       function onResult(res) {
         speechResult = res;
@@ -898,8 +898,8 @@
           else if (res.score >= 50) SoundFX.tap();
           else SoundFX.wrong();
         }
-        if (window.HanLoDB && HanLoDB.isSupported) {
-          HanLoDB.put("speaking_records", {
+        if (window.HanLoDB && window.HanLoDB.isSupported) {
+          window.HanLoDB.put("speaking_records", {
             word: word.h,
             pinyin: word.p,
             score: res.score,
@@ -928,8 +928,8 @@
 
   function initVirtualCanvas(char) {
     var host = $("#stroke-canvas-container");
-    if (!host || typeof StrokeCanvas === "undefined") return;
-    activeStrokeCanvas = new StrokeCanvas(host, {
+    if (!host || typeof window.StrokeCanvas === "undefined") return;
+    activeStrokeCanvas = new window.StrokeCanvas(host, {
       size: Math.min(320, window.innerWidth - 48),
       watermarkChar: char || "永",
       gridType: "mi",

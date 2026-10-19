@@ -4,7 +4,7 @@
 (function (global) {
   "use strict";
 
-  const SpeechRecognition = global.SpeechRecognition || global.webkitSpeechRecognition;
+  const SpeechRecognition = (global && (global.SpeechRecognition || global.webkitSpeechRecognition)) || (typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition)) || null;
 
   const HanLoSpeech = {
     isSupported: !!SpeechRecognition,
