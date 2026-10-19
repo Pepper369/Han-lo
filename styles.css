@@ -1540,4 +1540,361 @@ a { color: var(--blue); }
   color: var(--muted);
 }
 
+/* =========================================================
+   BENTHO TIỆN ÍCH MỞ RỘNG (WORKSHEET, TYPING, ANNOTATOR, GAME)
+   ========================================================= */
+.addon-tool-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all .15s;
+  text-decoration: none;
+  color: inherit;
+}
+.addon-tool-card:hover {
+  border-color: var(--jade);
+  background: var(--jade-soft);
+  transform: translateY(-1px);
+}
+.atc-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.atc-icon {
+  font-size: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--paper-2);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.atc-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+.atc-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 2px 0 0;
+}
+
+/* =========================================================
+   1. VỞ TẬP VIẾT CHỮ HÁN (WORKSHEET GENERATOR)
+   ========================================================= */
+.ws-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+}
+.ws-controls {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+.ws-control-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.ws-control-item label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.ws-control-item select, .ws-control-item input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 13px;
+  outline: none;
+}
+.ws-preview-box {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  color: #1c1917;
+  overflow-x: auto;
+}
+.ws-live-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ws-live-meta {
+  width: 120px;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 11px;
+}
+.ws-live-cells {
+  display: flex;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+/* =========================================================
+   2. LUYỆN GÕ PINYIN (PINYIN TYPING MASTER)
+   ========================================================= */
+.typing-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+}
+.typing-hero {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.typing-target-char {
+  font-family: var(--serif);
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--jade);
+  line-height: 1.1;
+  margin: 10px 0;
+}
+.typing-target-hint {
+  font-size: 14px;
+  color: var(--muted);
+}
+.typing-target-hint b {
+  color: var(--ink);
+}
+.typing-input-wrap {
+  width: 100%;
+  max-width: 380px;
+  margin-top: 18px;
+  position: relative;
+}
+.typing-input {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 2px solid var(--jade);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(47, 111, 94, 0.12);
+  transition: all .15s;
+}
+.typing-input:focus {
+  border-color: #b97a12;
+  box-shadow: 0 4px 16px rgba(185, 122, 18, 0.18);
+}
+.typing-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+  margin-top: 16px;
+}
+.stat-pill {
+  background: var(--paper-2);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.stat-pill-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--jade);
+}
+.stat-pill-lbl {
+  font-size: 10.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.typing-streak-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   3. CÔNG CỤ THÊM PINYIN (PINYIN RUBY ANNOTATOR)
+   ========================================================= */
+.annotator-box {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  margin-top: 14px;
+}
+.annotator-textarea {
+  width: 100%;
+  min-height: 110px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 15px;
+  padding: 12px;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+.annotator-textarea:focus {
+  border-color: var(--jade);
+}
+.annotator-result {
+  margin-top: 16px;
+  padding: 18px;
+  background: var(--card);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  min-height: 90px;
+  line-height: 2.4;
+  font-size: 22px;
+  font-family: var(--serif);
+}
+.ruby-token {
+  margin: 0 2px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: background .12s;
+}
+.ruby-token:hover {
+  background: var(--jade-soft);
+  color: var(--jade);
+}
+.ruby-token rt {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--jade);
+  line-height: 1;
+}
+
+/* =========================================================
+   4. TRÒ CHƠI HỌC CHỮ HÁN & THÀNH NGỮ (HANZI GAMES)
+   ========================================================= */
+.game-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+}
+.game-arena {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px 16px;
+  text-align: center;
+  position: relative;
+}
+.idiom-slots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 18px 0;
+}
+.idiom-slot {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.idiom-slot.blank {
+  border-style: dashed;
+  border-color: #b97a12;
+  background: #fefce8;
+  color: #b97a12;
+  animation: pulse-border 1.5s infinite;
+}
+@keyframes pulse-border {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.game-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-width: 320px;
+  margin: 16px auto 0;
+}
+.game-choice-btn {
+  height: 52px;
+  font-size: 24px;
+  font-family: var(--serif);
+  font-weight: 700;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .15s;
+}
+.game-choice-btn:hover {
+  border-color: var(--jade);
+  background: var(--jade-soft);
+  transform: translateY(-1px);
+}
+.game-choice-btn.correct {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #166534;
+}
+.game-choice-btn.wrong {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #991b1b;
+}
+.idiom-info-card {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border-radius: 12px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
 

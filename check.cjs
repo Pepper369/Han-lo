@@ -383,5 +383,60 @@ t("lộ trình học từ con số 0 đến HSK 3: cấp độ 0, đi nét từn
   assert.ok(appSrc.includes("card-mic"), "app.js phải có chức năng luyện nói trực tiếp trong thẻ từ");
 });
 
+/* ---------- Phase 13: XieHanzi Upgrades (Worksheet, Typing, Annotator, Games) ---------- */
+t("worksheet-generator.js: tạo ô Mễ, ô Điền, ô Hồi Cung và mã in A4 chuẩn vector SVG", () => {
+  const WG = require("./worksheet-generator.js");
+  assert.ok(WG.GRID_TYPES.mizi, "phải có ô Mễ");
+  assert.ok(WG.GRID_TYPES.tianzi, "phải có ô Điền");
+  assert.ok(WG.GRID_TYPES.huigong, "phải có ô Hồi Cung");
+  const svg = WG.generateCellSvg("好", 1, "mizi", "cinnabar", 48);
+  assert.ok(svg.includes("<svg") && svg.includes("好"), "phải sinh mã SVG hợp lệ có chữ");
+  const printHtml = WG.generatePrintHTML({ words: [{ h: "你好", p: "nǐhǎo", hv: "NHĨ HẢO", vi: "Xin chào" }] });
+  assert.ok(printHtml.includes("@page { size: A4"), "phải có CSS định dạng khổ A4");
+  assert.ok(printHtml.includes("ws-row"), "phải có hàng chữ tập viết");
+});
+
+t("pinyin-typing.js: chuẩn hóa pinyin không dấu, đo CPM, WPM và streak", () => {
+  const PT = require("./pinyin-typing.js");
+  assert.strictEqual(PT.normalizePinyin("zhōngguó"), "zhongguo");
+  assert.strictEqual(PT.normalizePinyin("nǐ hǎo!"), "nihao");
+  assert.strictEqual(PT.normalizePinyin("lǚxíng"), "lvxing");
+  const sess = PT.createSession([{ h: "中国", p: "zhōngguó" }], { mode: "timed_60s" });
+  const check = PT.checkInput(sess, "zhongguo");
+  assert.strictEqual(check.isCorrect, true);
+  assert.strictEqual(check.streak, 1);
+  assert.ok(check.stats.cpm > 0, "CPM phải được tính toán dương");
+});
+
+t("pinyin-annotator.js: bóc tách chữ Hán và gán thẻ HTML5 ruby chuẩn xác", () => {
+  const PA = require("./pinyin-annotator.js");
+  PA.initDict([{ h: "中国", p: "zhōngguó", hv: "TRUNG QUỐC", vi: "Nước Trung Quốc" }, { h: "人", p: "rén", hv: "NHÂN", vi: "Người" }]);
+  const tokens = PA.tokenize("我是中国人！");
+  assert.strictEqual(tokens.length, 5);
+  const rubyHtml = PA.toRubyHtml(tokens, "pinyin");
+  assert.ok(rubyHtml.includes("<ruby") && rubyHtml.includes("<rt>zhōngguó</rt>"), "phải sinh thẻ ruby chuẩn");
+  const plain = PA.toPlainText(tokens);
+  assert.ok(plain.includes("中国 (zhōngguó)"), "phải trích xuất plain text kèm pinyin");
+});
+
+t("hanzi-games.js: ngân hàng thành ngữ 4 chữ và logic ghép bộ thủ", () => {
+  const HG = require("./hanzi-games.js");
+  assert.ok(Array.isArray(HG.IDIOMS) && HG.IDIOMS.length >= 20, "phải có ít nhất 20 thành ngữ HSK");
+  HG.IDIOMS.forEach(idm => {
+    assert.strictEqual(Array.from(idm.c).length, 4, "thành ngữ phải đúng 4 chữ: " + idm.c);
+    assert.ok(idm.p && idm.hv && idm.m && idm.s, "thiếu thông tin thành ngữ: " + idm.c);
+  });
+  const iq = HG.createIdiomQuestion();
+  assert.strictEqual(iq.displayChars.filter(x => x === null).length, 1, "câu hỏi phải khuyết đúng 1 vị trí");
+  assert.strictEqual(iq.choices.length, 4, "phải có 4 lựa chọn");
+  assert.ok(iq.choices.includes(iq.correctChar), "lựa chọn phải chứa đáp án đúng");
+
+  const rq = HG.createRadicalQuestion();
+  assert.ok(rq.parts.length >= 2, "phải có ít nhất 2 bộ phận");
+  assert.strictEqual(rq.choices.length, 4, "phải có 4 lựa chọn chữ Hán tạo thành");
+  assert.ok(rq.choices.includes(rq.correctResult), "lựa chọn phải chứa chữ đúng");
+});
+
 console.log("\n" + pass + " test(s) pass" + (process.exitCode ? " — CÓ LỖI" : ""));
+
 

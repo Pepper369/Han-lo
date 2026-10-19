@@ -231,6 +231,10 @@
     else if (view === "grammar") renderGrammar();
     else if (view === "reader") renderReader();
     else if (view === "speech") renderSpeech();
+    else if (view === "worksheet") renderWorksheet();
+    else if (view === "typing") renderTyping();
+    else if (view === "annotator") renderAnnotator();
+    else if (view === "game") renderGame();
     else if (view === "dict") renderDictList();
     else if (view === "write") renderWrite();
     else renderProgress();
@@ -453,6 +457,26 @@
             '<span class="bento-icon">📝</span>' +
             '<h4>Thi Thử HSK 1 &amp; 2</h4>' +
             '<p>Đề chuẩn 40–60 câu, đếm giờ, chấm điểm.</p>' +
+          '</div>' +
+          '<div class="bento-card" data-nav="worksheet">' +
+            '<span class="bento-icon">📄</span>' +
+            '<h4>Vở Tập Viết A4</h4>' +
+            '<p>Ô Mễ, ô Điền nét mờ, in &amp; xuất PDF trực tiếp.</p>' +
+          '</div>' +
+          '<div class="bento-card" data-nav="typing">' +
+            '<span class="bento-icon">⚡</span>' +
+            '<h4>Luyện Gõ Pinyin</h4>' +
+            '<p>Gõ pinyin ra chữ Hán, đo CPM &amp; độ chuẩn xác.</p>' +
+          '</div>' +
+          '<div class="bento-card" data-nav="annotator">' +
+            '<span class="bento-icon">🔤</span>' +
+            '<h4>Thêm Pinyin Đoạn Văn</h4>' +
+            '<p>Gán Pinyin &amp; Hán-Việt tự động cho đoạn văn bất kỳ.</p>' +
+          '</div>' +
+          '<div class="bento-card" data-nav="game">' +
+            '<span class="bento-icon">🎮</span>' +
+            '<h4>Ghép Thành Ngữ &amp; Bộ Thủ</h4>' +
+            '<p>成语消消乐 4 chữ &amp; giải phẫu chữ Hán vui nhộn.</p>' +
           '</div>' +
         '</div>' +
       "</section>" +
@@ -1731,6 +1755,645 @@
     if (!S.settings.onboarded) showWelcome();
   }
 
+  /* ================= 1. VỞ TẬP VIẾT CHỮ HÁN A4 ================= */
+  var wsCurrentWords = [];
+  var wsGridType = "mizi";
+  var wsFadeMode = "standard";
+  var wsColorTheme = "cinnabar";
+  var wsSource = "recent";
+
+  function updateWorksheetWords(source) {
+    wsSource = source || wsSource;
+    if (wsSource === "recent") {
+      var learned = WORDS.filter(function (w) { return !!S.cards[w.id]; });
+      wsCurrentWords = learned.length >= 5 ? learned.slice(-10) : WORDS.slice(0, 10);
+    } else if (wsSource === "hsk1_b1") {
+      wsCurrentWords = ALL_WORDS.filter(function (w) { return w.level === 1; }).slice(0, 10);
+    } else if (wsSource === "hsk1_all") {
+      wsCurrentWords = ALL_WORDS.filter(function (w) { return w.level === 1; });
+    } else if (wsSource === "hsk2_all") {
+      wsCurrentWords = ALL_WORDS.filter(function (w) { return w.level === 2; });
+    } else if (wsSource === "hsk3_all") {
+      wsCurrentWords = ALL_WORDS.filter(function (w) { return w.level === 3; });
+    } else if (wsSource === "custom") {
+      var customInput = $("#ws-custom-input");
+      var text = customInput ? customInput.value.trim() : "你好世界 学汉语";
+      var chars = Array.from(text).filter(function (ch) { return /[\u4e00-\u9fa5]/.test(ch); });
+      var map = {};
+      ALL_WORDS.forEach(function (w) { map[w.h] = w; });
+      wsCurrentWords = chars.map(function (ch) {
+        return map[ch] || { h: ch, p: "", hv: "", vi: "Luyện viết chữ " + ch };
+      });
+    }
+  }
+
+  function renderWorksheet() {
+    var el = $("#view-worksheet");
+    if (!el) return;
+    if (!wsCurrentWords.length) updateWorksheetWords("recent");
+
+    var previewRows = wsCurrentWords.slice(0, 4).map(function (w) {
+      var cells = [];
+      for (var i = 0; i < 8; i++) {
+        var op = WorksheetGenerator.getCellOpacity(i, wsFadeMode);
+        cells.push('<div style="width:38px;height:38px">' + WorksheetGenerator.generateCellSvg(w.h ? w.h[0] : "", op, wsGridType, wsColorTheme, 38) + '</div>');
+      }
+      return '<div class="ws-live-row">' +
+        '<div class="ws-live-meta">' +
+          '<div style="font-weight:700;color:var(--jade)">' + esc(w.p || '') + '</div>' +
+          '<div style="font-weight:600;font-size:10px">' + esc(w.hv || '') + '</div>' +
+        '</div>' +
+        '<div class="ws-live-cells">' + cells.join("") + '</div>' +
+      '</div>';
+    }).join("");
+
+    el.innerHTML =
+      '<div class="row-between" style="margin-bottom:14px">' +
+        '<div>' +
+          '<p class="eyebrow">Offline-First · Xuất In &amp; PDF</p>' +
+          '<h2 style="margin:2px 0">Trình Tạo Vở Tập Viết A4</h2>' +
+        '</div>' +
+        '<button class="btn ghost small" data-nav="home">← Trang chủ</button>' +
+      '</div>' +
+
+      '<section class="card">' +
+        '<p class="muted small">Tùy biến ô Mễ, ô Điền, ô Hồi Cung kèm nét mờ tập tô. In trực tiếp ra giấy hoặc xuất file PDF khổ A4.</p>' +
+        '<div class="ws-controls">' +
+          '<div class="ws-control-grid">' +
+            '<div class="ws-control-item">' +
+              '<label>Nguồn từ vựng:</label>' +
+              '<select id="ws-source-select">' +
+                '<option value="recent"' + (wsSource === "recent" ? ' selected' : '') + '>10 từ vừa học</option>' +
+                '<option value="hsk1_b1"' + (wsSource === "hsk1_b1" ? ' selected' : '') + '>HSK 1 · Bài 1 (10 từ)</option>' +
+                '<option value="hsk1_all"' + (wsSource === "hsk1_all" ? ' selected' : '') + '>HSK 1 · Toàn bộ (300 từ)</option>' +
+                '<option value="hsk2_all"' + (wsSource === "hsk2_all" ? ' selected' : '') + '>HSK 2 · Toàn bộ (200 từ)</option>' +
+                '<option value="hsk3_all"' + (wsSource === "hsk3_all" ? ' selected' : '') + '>HSK 3 · Toàn bộ (300 từ)</option>' +
+                '<option value="custom"' + (wsSource === "custom" ? ' selected' : '') + '>Tự nhập chữ Hán tùy ý...</option>' +
+              '</select>' +
+            '</div>' +
+            '<div class="ws-control-item">' +
+              '<label>Kiểu ô lưới:</label>' +
+              '<select id="ws-grid-select">' +
+                '<option value="mizi"' + (wsGridType === "mizi" ? ' selected' : '') + '>Ô Mễ (米字格) - Có đường chéo</option>' +
+                '<option value="tianzi"' + (wsGridType === "tianzi" ? ' selected' : '') + '>Ô Điền (田字格) - Chữ thập</option>' +
+                '<option value="huigong"' + (wsGridType === "huigong" ? ' selected' : '') + '>Ô Hồi Cung (回宫格) - Khung trung tâm</option>' +
+              '</select>' +
+            '</div>' +
+            '<div class="ws-control-item">' +
+              '<label>Chế độ nét mờ:</label>' +
+              '<select id="ws-fade-select">' +
+                '<option value="standard"' + (wsFadeMode === "standard" ? ' selected' : '') + '>Chuẩn (Đậm → Mờ dần → Trống)</option>' +
+                '<option value="trace_all"' + (wsFadeMode === "trace_all" ? ' selected' : '') + '>Tô toàn bộ (Nét mờ 100%)</option>' +
+                '<option value="blank"' + (wsFadeMode === "blank" ? ' selected' : '') + '>Thử thách (Chỉ mẫu ô đầu)</option>' +
+              '</select>' +
+            '</div>' +
+            '<div class="ws-control-item">' +
+              '<label>Màu sắc lưới:</label>' +
+              '<select id="ws-color-select">' +
+                '<option value="cinnabar"' + (wsColorTheme === "cinnabar" ? ' selected' : '') + '>Đỏ Chu Sa (朱砂)</option>' +
+                '<option value="jade"' + (wsColorTheme === "jade" ? ' selected' : '') + '>Xanh Ngọc Hán Lộ</option>' +
+                '<option value="charcoal"' + (wsColorTheme === "charcoal" ? ' selected' : '') + '>Mực Tàu Đen Xám</option>' +
+              '</select>' +
+            '</div>' +
+          '</div>' +
+          '<div id="ws-custom-wrap" class="' + (wsSource === "custom" ? '' : 'hidden') + '" style="margin-top:12px">' +
+            '<label class="muted small" style="display:block;margin-bottom:4px">Nhập danh sách chữ Hán cần luyện viết:</label>' +
+            '<input type="text" id="ws-custom-input" placeholder="Ví dụ: 你好世界 学中文 天天向上" value="你好世界 学汉语" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)">' +
+          '</div>' +
+          '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">' +
+            '<button class="btn primary" id="btn-ws-print">🖨️ In Vở Ngay / Xuất PDF A4 (' + wsCurrentWords.length + ' từ)</button>' +
+            '<button class="btn ghost" id="btn-ws-refresh">🔄 Cập nhật xem trước</button>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="card">' +
+        '<div class="row-between">' +
+          '<h3>Xem Trước Bản In (Khổ A4)</h3>' +
+          '<span class="muted small">Hiển thị mẫu 4 hàng</span>' +
+        '</div>' +
+        '<div class="ws-preview-box" id="ws-preview-box" style="margin-top:12px">' +
+          previewRows +
+        '</div>' +
+      '</section>';
+
+    bindWorksheetEvents();
+  }
+
+  function bindWorksheetEvents() {
+    var srcSel = $("#ws-source-select");
+    var gridSel = $("#ws-grid-select");
+    var fadeSel = $("#ws-fade-select");
+    var colorSel = $("#ws-color-select");
+    var customWrap = $("#ws-custom-wrap");
+    var printBtn = $("#btn-ws-print");
+    var refreshBtn = $("#btn-ws-refresh");
+
+    if (srcSel) {
+      srcSel.addEventListener("change", function () {
+        wsSource = srcSel.value;
+        if (customWrap) customWrap.classList.toggle("hidden", wsSource !== "custom");
+        updateWorksheetWords(wsSource);
+        renderWorksheet();
+      });
+    }
+    if (gridSel) {
+      gridSel.addEventListener("change", function () {
+        wsGridType = gridSel.value;
+        renderWorksheet();
+      });
+    }
+    if (fadeSel) {
+      fadeSel.addEventListener("change", function () {
+        wsFadeMode = fadeSel.value;
+        renderWorksheet();
+      });
+    }
+    if (colorSel) {
+      colorSel.addEventListener("change", function () {
+        wsColorTheme = colorSel.value;
+        renderWorksheet();
+      });
+    }
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", function () {
+        updateWorksheetWords(wsSource);
+        renderWorksheet();
+      });
+    }
+    if (printBtn) {
+      printBtn.addEventListener("click", function () {
+        updateWorksheetWords(wsSource);
+        WorksheetGenerator.printWorksheet({
+          title: "HÁN LỘ · VỞ TẬP VIẾT CHỮ HÁN",
+          subtitle: "Chuẩn đề cương HSK 3.0 · " + (wsCurrentWords.length) + " mục từ",
+          words: wsCurrentWords,
+          gridType: wsGridType,
+          fadeMode: wsFadeMode,
+          colorTheme: wsColorTheme,
+          cellsPerRow: 10
+        });
+      });
+    }
+  }
+
+  /* ================= 2. LUYỆN GÕ PINYIN (CPM MASTER) ================= */
+  var typingSession = null;
+  var typingTimerInterval = null;
+  var typingLevel = "1";
+  var typingMode = "timed_60s";
+
+  function startTypingSession() {
+    if (typingTimerInterval) clearInterval(typingTimerInterval);
+    var pool = WORDS.slice();
+    if (typingLevel === "1") pool = ALL_WORDS.filter(function (w) { return w.level === 1; });
+    else if (typingLevel === "2") pool = ALL_WORDS.filter(function (w) { return w.level === 2; });
+    else if (typingLevel === "3") pool = ALL_WORDS.filter(function (w) { return w.level === 3; });
+    else pool = ALL_WORDS.slice();
+
+    typingSession = PinyinTyping.createSession(pool, {
+      mode: typingMode,
+      timeLimit: 60,
+      wordLimit: 20
+    });
+
+    if (typingMode === "timed_60s") {
+      var timeLeft = 60;
+      typingTimerInterval = setInterval(function () {
+        if (!typingSession || typingSession.isFinished) {
+          clearInterval(typingTimerInterval);
+          return;
+        }
+        if (typingSession.startTime) {
+          timeLeft--;
+          var timerEl = $("#typing-timer-val");
+          if (timerEl) timerEl.textContent = timeLeft + "s";
+          if (timeLeft <= 0) {
+            clearInterval(typingTimerInterval);
+            typingSession.isFinished = true;
+            typingSession.endTime = Date.now();
+            if (window.SoundFX) SoundFX.playLevelUp();
+            renderTyping();
+          }
+        }
+      }, 1000);
+    }
+  }
+
+  function renderTyping() {
+    var el = $("#view-typing");
+    if (!el) return;
+    if (!typingSession) startTypingSession();
+
+    var currentWord = typingSession.words[typingSession.currentIndex] || { h: "好", p: "hǎo", hv: "HẢO", vi: "Tốt" };
+    var stats = PinyinTyping.getStats(typingSession);
+
+    if (typingSession.isFinished) {
+      el.innerHTML =
+        '<div class="row-between" style="margin-bottom:14px">' +
+          '<div>' +
+            '<p class="eyebrow">Thống Kê Tốc Độ Gõ</p>' +
+            '<h2 style="margin:2px 0">Kết Quả Luyện Gõ Pinyin</h2>' +
+          '</div>' +
+          '<button class="btn ghost small" data-nav="home">← Trang chủ</button>' +
+        '</div>' +
+
+        '<section class="card typing-hero">' +
+          '<div style="font-size:48px;margin-bottom:6px">🏆</div>' +
+          '<h3>' + (stats.cpm >= 120 ? 'Bậc Thầy Gõ Phím Thần Tốc! ⚡' : (stats.cpm >= 60 ? 'Tốc Độ Rất Tốt! 🎯' : 'Khởi Đầu Vững Chắc! 🌿')) + '</h3>' +
+          '<p class="muted small">Bạn đã hoàn thành phiên luyện gõ tiếng Trung chuẩn xác.</p>' +
+          '<div class="typing-stats-row">' +
+            '<div class="stat-pill"><div class="stat-pill-val">' + stats.cpm + '</div><div class="stat-pill-lbl">CPM (Ký tự/phút)</div></div>' +
+            '<div class="stat-pill"><div class="stat-pill-val">' + stats.wpm + '</div><div class="stat-pill-lbl">WPM (Từ/phút)</div></div>' +
+            '<div class="stat-pill"><div class="stat-pill-val">' + stats.accuracy + '%</div><div class="stat-pill-lbl">Độ chính xác</div></div>' +
+            '<div class="stat-pill"><div class="stat-pill-val">' + stats.maxStreak + '</div><div class="stat-pill-lbl">Chuỗi cao nhất</div></div>' +
+          '</div>' +
+          '<div style="margin-top:20px;display:flex;gap:10px">' +
+            '<button class="btn primary" id="btn-typing-restart">🔄 Thử lại vòng mới</button>' +
+            '<button class="btn ghost" data-nav="home">Về trang chủ</button>' +
+          '</div>' +
+        '</section>';
+
+      var restartBtn = $("#btn-typing-restart");
+      if (restartBtn) restartBtn.addEventListener("click", function () {
+        startTypingSession();
+        renderTyping();
+      });
+      return;
+    }
+
+    el.innerHTML =
+      '<div class="row-between" style="margin-bottom:14px">' +
+        '<div>' +
+          '<p class="eyebrow">IME Speed Trainer · Gõ Phím Phản Xạ</p>' +
+          '<h2 style="margin:2px 0">Luyện Gõ Pinyin Thần Tốc</h2>' +
+        '</div>' +
+        '<button class="btn ghost small" data-nav="home">← Trang chủ</button>' +
+      '</div>' +
+
+      '<section class="card typing-hero">' +
+        '<div class="typing-streak-badge">🔥 Streak: ' + stats.streak + '</div>' +
+        '<div class="typing-target-char">' + esc(currentWord.h) + '</div>' +
+        '<div class="typing-target-hint">Hán–Việt: <b>' + esc(currentWord.hv) + '</b> · Nghĩa: <b>' + esc(currentWord.vi) + '</b></div>' +
+
+        '<div class="typing-input-wrap">' +
+          '<input type="text" id="typing-input" class="typing-input" placeholder="Gõ pinyin (VD: ' + PinyinTyping.normalizePinyin(currentWord.p) + ') rồi Enter..." autofocus autocomplete="off" autocapitalize="off" spellcheck="false">' +
+        '</div>' +
+
+        '<div class="typing-stats-row">' +
+          '<div class="stat-pill"><div class="stat-pill-val" id="typing-cpm-val">' + stats.cpm + '</div><div class="stat-pill-lbl">CPM</div></div>' +
+          '<div class="stat-pill"><div class="stat-pill-val" id="typing-acc-val">' + stats.accuracy + '%</div><div class="stat-pill-lbl">Chính xác</div></div>' +
+          '<div class="stat-pill"><div class="stat-pill-val" id="typing-correct-val">' + stats.correctWords + '</div><div class="stat-pill-lbl">Đúng</div></div>' +
+          '<div class="stat-pill"><div class="stat-pill-val" id="typing-timer-val">' + (typingMode === "timed_60s" ? '60s' : stats.elapsedSeconds + 's') + '</div><div class="stat-pill-lbl">Thời gian</div></div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="card">' +
+        '<div class="row-between">' +
+          '<h3>Tùy Chọn Chế Độ</h3>' +
+          '<button class="btn ghost small" id="btn-typing-reset">Làm mới</button>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
+          '<button class="chip' + (typingLevel === "1" ? ' active' : '') + '" data-typing-lvl="1">HSK 1 (300 từ)</button>' +
+          '<button class="chip' + (typingLevel === "2" ? ' active' : '') + '" data-typing-lvl="2">HSK 2 (200 từ)</button>' +
+          '<button class="chip' + (typingLevel === "3" ? ' active' : '') + '" data-typing-lvl="3">HSK 3 (300 từ)</button>' +
+          '<button class="chip' + (typingLevel === "all" ? ' active' : '') + '" data-typing-lvl="all">Tất cả (800 từ)</button>' +
+        '</div>' +
+      '</section>';
+
+    bindTypingEvents();
+  }
+
+  function bindTypingEvents() {
+    var inp = $("#typing-input");
+    if (inp) {
+      inp.focus();
+      inp.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          var val = inp.value.trim();
+          if (!val) return;
+          var res = PinyinTyping.checkInput(typingSession, val);
+          if (res.isCorrect) {
+            if (window.SoundFX) SoundFX.playCorrect();
+          } else {
+            if (window.SoundFX) SoundFX.playWrong();
+          }
+          renderTyping();
+        }
+      });
+    }
+
+    document.querySelectorAll("[data-typing-lvl]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        typingLevel = btn.dataset.typingLvl;
+        startTypingSession();
+        renderTyping();
+      });
+    });
+
+    var resetBtn = $("#btn-typing-reset");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        startTypingSession();
+        renderTyping();
+      });
+    }
+  }
+
+  /* ================= 3. THÊM PINYIN CHO ĐOẠN VĂN (RUBY ANNOTATOR) ================= */
+  var annotatorText = "大家好！我叫小龙，我是越南人。我现在在学习汉语，汉语很有意思，汉字也很漂亮。";
+  var annotatorDisplayMode = "pinyin";
+
+  function renderAnnotator() {
+    var el = $("#view-annotator");
+    if (!el) return;
+
+    if (typeof PinyinAnnotator !== "undefined") {
+      PinyinAnnotator.initDict(ALL_WORDS);
+    }
+
+    var tokens = PinyinAnnotator.tokenize(annotatorText);
+    var rubyHtml = PinyinAnnotator.toRubyHtml(tokens, annotatorDisplayMode);
+
+    el.innerHTML =
+      '<div class="row-between" style="margin-bottom:14px">' +
+        '<div>' +
+          '<p class="eyebrow">Ruby Text Annotator · Phân Tích Văn Bản</p>' +
+          '<h2 style="margin:2px 0">Thêm Pinyin Cho Đoạn Văn</h2>' +
+        '</div>' +
+        '<button class="btn ghost small" data-nav="home">← Trang chủ</button>' +
+      '</div>' +
+
+      '<section class="card">' +
+        '<p class="muted small">Dán bất kỳ đoạn văn, tin tức hay bài báo chữ Hán vào đây để tự động thêm Pinyin và âm Hán-Việt trên đầu từng chữ.</p>' +
+        '<div class="annotator-box">' +
+          '<textarea id="annotator-textarea" class="annotator-textarea" placeholder="Dán văn bản tiếng Trung vào đây...">' + esc(annotatorText) + '</textarea>' +
+          '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">' +
+            '<span class="muted small" style="font-weight:600">Đoạn văn mẫu:</span>' +
+            '<button class="chip" data-sample="1">Giới thiệu bản thân</button>' +
+            '<button class="chip" data-sample="2">Thơ Tĩnh Dạ Tứ</button>' +
+            '<button class="chip" data-sample="3">Đi mua sắm HSK</button>' +
+          '</div>' +
+          '<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center">' +
+            '<button class="btn primary" id="btn-annotator-run">🔤 Thêm Pinyin &amp; Phân Tích</button>' +
+            '<div class="chips" id="annotator-mode-chips">' +
+              '<button class="chip' + (annotatorDisplayMode === "pinyin" ? ' active' : '') + '" data-mode="pinyin">Pinyin trên đầu</button>' +
+              '<button class="chip' + (annotatorDisplayMode === "hv" ? ' active' : '') + '" data-mode="hv">Âm Hán–Việt</button>' +
+              '<button class="chip' + (annotatorDisplayMode === "both" ? ' active' : '') + '" data-mode="both">Pinyin + Hán-Việt</button>' +
+              '<button class="chip' + (annotatorDisplayMode === "hanzi" ? ' active' : '') + '" data-mode="hanzi">Chỉ chữ Hán</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="card">' +
+        '<div class="row-between">' +
+          '<h3>Kết Quả Văn Bản Kèm Pinyin</h3>' +
+          '<div style="display:flex;gap:6px">' +
+            '<button class="btn ghost small" id="btn-copy-annotated">📋 Sao chép</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="muted small">Nhấp vào bất kỳ từ nào để tra nghĩa, âm Hán-Việt và thứ tự nét tức thì.</p>' +
+        '<div class="annotator-result" id="annotator-result">' +
+          rubyHtml +
+        '</div>' +
+      '</section>';
+
+    bindAnnotatorEvents();
+  }
+
+  function bindAnnotatorEvents() {
+    var ta = $("#annotator-textarea");
+    var runBtn = $("#btn-annotator-run");
+    var copyBtn = $("#btn-copy-annotated");
+
+    if (runBtn) {
+      runBtn.addEventListener("click", function () {
+        if (ta) annotatorText = ta.value;
+        renderAnnotator();
+      });
+    }
+
+    document.querySelectorAll("[data-sample]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var s = btn.dataset.sample;
+        if (s === "1") annotatorText = "大家好！我叫小龙，我是越南人。我现在在学习汉语，汉语很有意思，汉字也很漂亮。";
+        else if (s === "2") annotatorText = "床前明月光，疑是地上霜。举头望明月，低头思故乡。";
+        else if (s === "3") annotatorText = "今天天气很好，我和朋友一起去商店买东西。我们吃了中国菜，喝了中国茶。";
+        if (ta) ta.value = annotatorText;
+        renderAnnotator();
+      });
+    });
+
+    document.querySelectorAll("#annotator-mode-chips .chip").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        annotatorDisplayMode = btn.dataset.mode;
+        renderAnnotator();
+      });
+    });
+
+    if (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        var tokens = PinyinAnnotator.tokenize(annotatorText);
+        var txt = PinyinAnnotator.toPlainText(tokens);
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(txt).then(function () {
+            toast("Đã sao chép văn bản kèm Pinyin vào bộ nhớ tạm!");
+          });
+        } else {
+          toast("Văn bản đã tạo xong.");
+        }
+      });
+    }
+
+    // Tra từ khi click vào chữ Hán
+    var resultBox = $("#annotator-result");
+    if (resultBox) {
+      resultBox.addEventListener("click", function (e) {
+        var tok = e.target.closest(".lookup-trigger");
+        if (tok && tok.dataset.h) {
+          openLookup(tok.dataset.h, tok.dataset.p, tok.dataset.hv, tok.dataset.vi);
+        }
+      });
+    }
+  }
+
+  /* ================= 4. TRÒ CHƠI CHỮ HÁN & THÀNH NGỮ ================= */
+  var gameTab = "idiom";
+  var currentIdiomQ = null;
+  var currentRadicalQ = null;
+  var gameScore = 0;
+  var gameStreak = 0;
+  var gameAnswered = false;
+
+  function renderGame() {
+    var el = $("#view-game");
+    if (!el) return;
+
+    if (gameTab === "idiom" && !currentIdiomQ) {
+      currentIdiomQ = HanziGames.createIdiomQuestion();
+      gameAnswered = false;
+    } else if (gameTab === "radical" && !currentRadicalQ) {
+      currentRadicalQ = HanziGames.createRadicalQuestion();
+      gameAnswered = false;
+    }
+
+    var contentHtml = "";
+
+    if (gameTab === "idiom") {
+      var q = currentIdiomQ;
+      var slotsHtml = q.displayChars.map(function (ch, idx) {
+        if (ch === null) {
+          return '<div class="idiom-slot blank" id="idiom-blank-slot">?</div>';
+        }
+        return '<div class="idiom-slot">' + esc(ch) + '</div>';
+      }).join("");
+
+      var choicesHtml = q.choices.map(function (ch) {
+        return '<button class="game-choice-btn" data-choice="' + esc(ch) + '">' + esc(ch) + '</button>';
+      }).join("");
+
+      var infoCardHtml = gameAnswered ?
+        '<div class="idiom-info-card">' +
+          '<div style="font-size:16px;font-weight:700;color:var(--jade)">' + esc(q.idiom.c) + ' · ' + esc(q.idiom.p) + '</div>' +
+          '<div style="font-weight:600;margin:2px 0">' + esc(q.idiom.hv) + '</div>' +
+          '<div style="color:var(--ink)"><b>Ý nghĩa:</b> ' + esc(q.idiom.m) + '</div>' +
+          '<div class="muted small" style="margin-top:4px"><b>Điển tích:</b> ' + esc(q.idiom.s) + '</div>' +
+          '<div style="margin-top:12px"><button class="btn primary small" id="btn-next-idiom">Thành ngữ tiếp theo →</button></div>' +
+        '</div>' : '';
+
+      contentHtml =
+        '<div class="game-arena">' +
+          '<div class="typing-streak-badge">⭐ Điểm: ' + gameScore + ' · 🔥 Streak: ' + gameStreak + '</div>' +
+          '<p class="eyebrow" style="margin-top:4px">Chọn chữ Hán còn thiếu để hoàn thành thành ngữ 4 chữ:</p>' +
+          '<div class="idiom-slots">' + slotsHtml + '</div>' +
+          '<div class="game-options-grid" id="idiom-choices">' + choicesHtml + '</div>' +
+          infoCardHtml +
+        '</div>';
+    } else {
+      var rq = currentRadicalQ;
+      var partsDisplay = rq.parts.join("  +  ");
+      var rChoicesHtml = rq.choices.map(function (ch) {
+        return '<button class="game-choice-btn" data-rchoice="' + esc(ch) + '">' + esc(ch) + '</button>';
+      }).join("");
+
+      var rInfoCardHtml = gameAnswered ?
+        '<div class="idiom-info-card">' +
+          '<div style="font-size:16px;font-weight:700;color:var(--jade)">' + esc(rq.item.result) + ' (' + esc(rq.item.p) + ') · ' + esc(rq.item.hv) + '</div>' +
+          '<div style="color:var(--ink)"><b>Nghĩa:</b> ' + esc(rq.item.vi) + '</div>' +
+          '<div style="margin-top:12px"><button class="btn primary small" id="btn-next-radical">Câu tiếp theo →</button></div>' +
+        '</div>' : '';
+
+      contentHtml =
+        '<div class="game-arena">' +
+          '<div class="typing-streak-badge">⭐ Điểm: ' + gameScore + ' · 🔥 Streak: ' + gameStreak + '</div>' +
+          '<p class="eyebrow" style="margin-top:4px">Ghép các bộ thủ sau thành chữ Hán có nghĩa:</p>' +
+          '<div style="font-family:var(--serif);font-size:42px;font-weight:700;color:var(--jade);margin:16px 0">' + esc(partsDisplay) + '  =  ?</div>' +
+          '<div class="game-options-grid" id="radical-choices">' + rChoicesHtml + '</div>' +
+          rInfoCardHtml +
+        '</div>';
+    }
+
+    el.innerHTML =
+      '<div class="row-between" style="margin-bottom:14px">' +
+        '<div>' +
+          '<p class="eyebrow">Gamification · Học Qua Trò Chơi</p>' +
+          '<h2 style="margin:2px 0">Trò Chơi Chữ Hán &amp; Thành Ngữ</h2>' +
+        '</div>' +
+        '<button class="btn ghost small" data-nav="home">← Trang chủ</button>' +
+      '</div>' +
+
+      '<div style="display:flex;gap:8px;margin-bottom:14px">' +
+        '<button class="chip' + (gameTab === "idiom" ? ' active' : '') + '" data-gametab="idiom">🏮 Ghép Thành Ngữ 4 Chữ (成语)</button>' +
+        '<button class="chip' + (gameTab === "radical" ? ' active' : '') + '" data-gametab="radical">🧩 Ghép Bộ Thủ (Radical Fusion)</button>' +
+      '</div>' +
+      contentHtml;
+
+    bindGameEvents();
+  }
+
+  function bindGameEvents() {
+    document.querySelectorAll("[data-gametab]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        gameTab = btn.dataset.gametab;
+        gameAnswered = false;
+        renderGame();
+      });
+    });
+
+    if (gameTab === "idiom" && !gameAnswered) {
+      var box = $("#idiom-choices");
+      if (box) {
+        box.addEventListener("click", function (e) {
+          var btn = e.target.closest("[data-choice]");
+          if (!btn || gameAnswered) return;
+          var ch = btn.dataset.choice;
+          gameAnswered = true;
+          if (ch === currentIdiomQ.correctChar) {
+            btn.classList.add("correct");
+            var blank = $("#idiom-blank-slot");
+            if (blank) {
+              blank.textContent = ch;
+              blank.classList.remove("blank");
+            }
+            gameScore += 10;
+            gameStreak++;
+            if (window.SoundFX) SoundFX.playCorrect();
+            renderGame();
+          } else {
+            btn.classList.add("wrong");
+            gameStreak = 0;
+            if (window.SoundFX) SoundFX.playWrong();
+            renderGame();
+          }
+        });
+      }
+    }
+
+    var nextIdiomBtn = $("#btn-next-idiom");
+    if (nextIdiomBtn) {
+      nextIdiomBtn.addEventListener("click", function () {
+        currentIdiomQ = HanziGames.createIdiomQuestion();
+        gameAnswered = false;
+        renderGame();
+      });
+    }
+
+    if (gameTab === "radical" && !gameAnswered) {
+      var rBox = $("#radical-choices");
+      if (rBox) {
+        rBox.addEventListener("click", function (e) {
+          var btn = e.target.closest("[data-rchoice]");
+          if (!btn || gameAnswered) return;
+          var ch = btn.dataset.rchoice;
+          gameAnswered = true;
+          if (ch === currentRadicalQ.correctResult) {
+            btn.classList.add("correct");
+            gameScore += 10;
+            gameStreak++;
+            if (window.SoundFX) SoundFX.playCorrect();
+            renderGame();
+          } else {
+            btn.classList.add("wrong");
+            gameStreak = 0;
+            if (window.SoundFX) SoundFX.playWrong();
+            renderGame();
+          }
+        });
+      }
+    }
+
+    var nextRadicalBtn = $("#btn-next-radical");
+    if (nextRadicalBtn) {
+      nextRadicalBtn.addEventListener("click", function () {
+        currentRadicalQ = HanziGames.createRadicalQuestion();
+        gameAnswered = false;
+        renderGame();
+      });
+    }
+  }
+
   /* ================= sự kiện ================= */
   document.addEventListener("click", function (e) {
     var el = e.target.closest("[data-act],[data-nav],[data-filter],[data-wchar],[data-wfilter]");
@@ -2005,6 +2668,6 @@
     });
   }
   var hash = (location.hash || "").replace("#", "");
-  if (["dict", "progress", "write", "exam", "phonics", "grammar", "reader"].indexOf(hash) > -1) view = hash;
+  if (["dict", "progress", "write", "exam", "phonics", "grammar", "reader", "speech", "worksheet", "typing", "annotator", "game"].indexOf(hash) > -1) view = hash;
   render();
 })();

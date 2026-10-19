@@ -35,6 +35,10 @@ python -m http.server 8000
 | `exam-data.js` | Đề thi thử HSK 1 (40 câu) & HSK 2 (60 câu) chuẩn CTI, đếm giờ & tự động chấm điểm |
 | `hsk3-data.js` | 300 từ vựng cốt lõi HSK 3 (chuẩn HSK 3.0) kèm đầy đủ pinyin, Hán–Việt và nghĩa |
 | `db.js` | Hệ thống lưu trữ Client-Side chuẩn IndexedDB API thuần (`HanLoDB`), auto-migration từ localStorage |
+| `worksheet-generator.js` | Trình tạo vở tập viết chữ Hán A4: ô Mễ, ô Điền, ô Hồi Cung, nét mờ, in/xuất PDF |
+| `pinyin-typing.js` | IME Speed Trainer: Luyện gõ Pinyin ra chữ Hán đo CPM, WPM, độ chuẩn xác & combo |
+| `pinyin-annotator.js` | Ruby Text Annotator: Tự động thêm Pinyin và âm Hán-Việt cho đoạn văn bất kỳ |
+| `hanzi-games.js` | Gamification: Ghép thành ngữ 4 chữ (成语消消乐) & Ghép bộ thủ (Radical Fusion) |
 | `speech-recognition.js` | Bộ nhận diện giọng nói Web Speech AI zh-CN & chấm điểm phát âm trực tiếp |
 | `stroke-canvas.js` | Bảng vẽ nét thư pháp HTML5 Canvas thuần kèm cẩm nang 8 quy tắc bút thuận vàng |
 | `audio-fx.js` | Web Audio Synthesizer: âm thanh phách gỗ, khánh ngọc, chuông thiền không cần file âm thanh ngoài |
@@ -42,11 +46,11 @@ python -m http.server 8000
 Tính năng học & luyện tập:
 
 - **800 từ vựng HSK 1, HSK 2 & HSK 3** (300 từ HSK 1 + 200 từ HSK 2 + 300 từ HSK 3) chuẩn đề cương HSK 3.0.
-- **Bộ chuyển cấp độ 4 chế độ**: Học riêng `HSK 1`, `HSK 2`, `HSK 3` hoặc `Tất cả` (800 từ).
-- **Ôn tập cách quãng (SM-2)**: Quên → 10 phút; nhớ → 1, 3, 6… ngày.
-- **4 dạng câu hỏi tương tác**: Hán → nghĩa, nghĩa → Hán, Hán → pinyin, nghe → chọn chữ.
-- **Pinyin tô màu 4 thanh điệu**, âm Hán–Việt in hoa làm cầu nối tư duy, phát âm TTS chuẩn bản địa.
-- **Bảng Ngữ âm Pinyin Master**: Biểu đồ cao độ thanh điệu trực quan (Tone Curve Visualizer) giúp khắc phục lỗi thanh 1 và thanh 4.
+- **Bộ chuyển cấp độ 5 chế độ**: `Số 0`, `HSK 1`, `HSK 2`, `HSK 3` hoặc `Tất cả` (800 từ).
+- **Vở tập viết A4 chuẩn in ấn**: Tùy biến ô Mễ (米字格), ô Điền (田字格), ô Hồi Cung (回宫格), nét mờ tập tô, xuất PDF/in trực tiếp.
+- **Luyện gõ Pinyin thần tốc (Pinyin Typing Master)**: Luyện gõ pinyin không dấu ra chữ Hán, đo tốc độ CPM và WPM chuẩn xác.
+- **Thêm Pinyin cho đoạn văn (Ruby Annotator)**: Dán văn bản tiếng Trung, tự động gán Pinyin & Hán-Việt trên đầu, tra cứu tức thì.
+- **Trò chơi chữ Hán (Gamification)**: Ghép thành ngữ 4 chữ (成语消消乐) kèm điển tích văn hóa & ghép bộ thủ tạo chữ.
 - **Luyện nói & Chấm phát âm (Speaking Master)**: Web Speech AI chấm điểm phát âm tiếng Trung theo % chuẩn xác, phản hồi tức thì bằng âm thanh khánh ngọc / phách gỗ.
 - **Bảng vẽ nét thư pháp độc lập (Virtual Stroke Canvas)**: Luyện viết trên lưới Mễ (米) với mực bút lông biến thiên độ dày theo tốc độ di bút, chữ mẫu chìm và cẩm nang 8 quy tắc bút thuận vàng.
 - **Luyện đọc tương tác (HSK Reader)**: Ẩn/hiện pinyin, nhấp vào từ bất kỳ để mở popup tra cứu tức thì mà không cần chuyển trang.
@@ -64,12 +68,16 @@ Tính năng học & luyện tập:
 
 ```
 han-lo/
-  index.html            ứng dụng chính (Bento Grid, 5 phân hệ học)
+  index.html            ứng dụng chính (Bento Grid, 9 phân hệ học)
   gioi-thieu.html       trang giới thiệu HSK 3.0
   404.html              trang lỗi
   styles.css            toàn bộ giao diện (sáng/tối, bento grid, thi thử, modal, heatmap)
   data.js               500 từ HSK 1 & HSK 2: [Hán, pinyin, Hán–Việt, nghĩa]
   hsk3-data.js          300 từ HSK 3 chuẩn HSK 3.0
+  worksheet-generator.js trình tạo vở tập viết chữ Hán A4 xuất in/PDF
+  pinyin-typing.js      bộ luyện gõ Pinyin đo CPM/WPM
+  pinyin-annotator.js   bộ bóc tách & thêm Pinyin cho văn bản tự do
+  hanzi-games.js        game ghép thành ngữ 4 chữ & ghép bộ thủ
   db.js                 IndexedDB API thuần 6 Object Stores & auto-migration
   speech-recognition.js Web Speech AI nhận diện giọng nói & chấm điểm zh-CN
   stroke-canvas.js      bảng vẽ nét thư pháp & 8 quy tắc bút thuận vàng
@@ -83,7 +91,7 @@ han-lo/
   sw.js                 service worker (cache shell app, offline 100%)
   manifest.webmanifest  khai báo PWA
   icons/                icon PWA (192, 512, maskable, apple-touch)
-  check.cjs             bộ 28 test tự động: dữ liệu, thi thử, audio-fx, PWA, IndexedDB
+  check.cjs             bộ 34 test tự động: toàn bộ dữ liệu, thuật toán, audio-fx, PWA, IndexedDB
   docs/                 đề án nâng cấp kiến trúc và tài liệu nghiên cứu
   serve.cmd             chạy server tĩnh nhanh
 ```
@@ -94,7 +102,7 @@ han-lo/
 node check.cjs
 ```
 
-Chạy toàn bộ **28 bài kiểm tra tự động**:
+Chạy toàn bộ **34 bài kiểm tra tự động**:
 1. 300 từ HSK 1, 200 từ HSK 2, 300 từ HSK 3 đúng 4 trường, không trùng lặp.
 2. Pinyin hợp lệ âm tiết Latinh + dấu thanh chuẩn quốc tế.
 3. Toàn bộ file tham chiếu trong HTML, Manifest, Service Worker tồn tại.
@@ -102,6 +110,10 @@ Chạy toàn bộ **28 bài kiểm tra tự động**:
 5. Đề thi thử HSK 1 (40 câu) & HSK 2 (60 câu) và logic chấm điểm chuẩn xác.
 6. Cú pháp và dữ liệu của `audio-fx.js`, `phonics-data.js`, `grammar-data.js`, `reader-data.js`.
 7. Module lưu trữ `db.js` (IndexedDB), nhận diện giọng nói `speech-recognition.js`, và canvas `stroke-canvas.js`.
+8. Trình tạo vở tập viết `worksheet-generator.js` (ô Mễ, Điền, Hồi Cung, vector SVG, A4 print).
+9. Luyện gõ `pinyin-typing.js` (CPM, WPM, accuracy, streak).
+10. Gán pinyin `pinyin-annotator.js` (Longest Match First, thẻ HTML5 ruby).
+11. Ngân hàng thành ngữ & game `hanzi-games.js`.
 
 ## Triển khai (deploy)
 
