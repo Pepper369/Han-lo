@@ -1,20 +1,59 @@
 "use strict";
 /* Hán Lộ — app học HSK 1 (HSK 3.0). Không framework, không backend, dữ liệu lưu localStorage. */
 (function () {
-  var WORDS = (window.HSK1 || []).map(function (row, id) {
-    return { id: id, h: row[0], p: row[1], hv: row[2], vi: row[3], lesson: Math.floor(id / 10) + 1 };
+  var ALL_WORDS = [];
+  (window.HSK1 || []).forEach(function (row, id) {
+    ALL_WORDS.push({ id: id, level: 1, h: row[0], p: row[1], hv: row[2], vi: row[3] });
   });
+  (window.HSK2 || []).forEach(function (row, i) {
+    ALL_WORDS.push({ id: 300 + i, level: 2, h: row[0], p: row[1], hv: row[2], vi: row[3] });
+  });
+
   var LESSON_SIZE = 10;
-  var LESSONS = Math.ceil(WORDS.length / LESSON_SIZE);
-  var CHARS = (function () {
+  var currentLvl = "1";
+  var WORDS = [];
+  var LESSONS = 0;
+  var CHARS = [];
+
+  function setLevel(lvl) {
+    currentLvl = String(lvl || "1");
+    if (currentLvl === "1") {
+      WORDS = ALL_WORDS.filter(function (w) { return w.level === 1; });
+    } else if (currentLvl === "2") {
+      WORDS = ALL_WORDS.filter(function (w) { return w.level === 2; });
+    } else {
+      WORDS = ALL_WORDS.slice();
+    }
+    WORDS.forEach(function (w, idx) {
+      w.lesson = Math.floor(idx / LESSON_SIZE) + 1;
+    });
+    LESSONS = Math.ceil(WORDS.length / LESSON_SIZE);
+
     var seen = {}, out = [];
     WORDS.forEach(function (w) {
       Array.from(w.h).forEach(function (ch) {
         if (!seen[ch]) { seen[ch] = true; out.push(ch); }
       });
     });
-    return out;
-  })();
+    CHARS = out;
+
+    var subEl = $("#brand-sub");
+    if (subEl) {
+      if (currentLvl === "1") subEl.textContent = "HSK 1 · 300 từ";
+      else if (currentLvl === "2") subEl.textContent = "HSK 2 · 200 từ";
+      else subEl.textContent = "HSK 1+2 · 500 từ";
+    }
+
+    document.querySelectorAll(".level-pill").forEach(function (btn) {
+      btn.classList.toggle("active", btn.dataset.lvl === currentLvl);
+    });
+
+    if (S && S.settings && S.settings.level !== currentLvl) {
+      S.settings.level = currentLvl;
+      save();
+    }
+  }
+
   var KEY = "hanlo.v1";
   var $ = function (sel) { return document.querySelector(sel); };
 
@@ -23,7 +62,7 @@
     return {
       v: 1,
       cards: {},
-      settings: { pinyin: true, audio: true, goal: 10, onboarded: false, goalType: "thi" },
+      settings: { pinyin: true, audio: true, goal: 10, onboarded: false, goalType: "thi", level: "1" },
       streak: { count: 0, last: "" },
       history: {},
       daily: { date: "", new: 0 }
@@ -43,6 +82,7 @@
     } catch (e) { return d; }
   }
   var S = load();
+  setLevel(S.settings.level || "1");
 
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* chế độ riêng tư: bỏ qua */ }
@@ -206,7 +246,7 @@
       "</section>" +
 
       '<section class="card">' +
-        '<div class="row-between"><h3>Tiến độ HSK 1</h3><span class="muted">' + learned + "/" + WORDS.length + " từ</span></div>" +
+        '<div class="row-between"><h3>Tiến độ ' + (currentLvl === "1" ? "HSK 1" : currentLvl === "2" ? "HSK 2" : "HSK 1+2") + '</h3><span class="muted">' + learned + "/" + WORDS.length + " từ</span></div>" +
         '<div class="bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="Tiến độ từ vựng">' +
           '<i style="width:' + pct + '%"></i></div>' +
         '<div class="legend">' +
@@ -222,7 +262,7 @@
         '<p class="muted small">10 từ / bài · nhấn số để học riêng bài đó</p>' +
         '<div class="lessons">' + lessonChips + "</div>" +
       "</section>" +
-      '<p class="home-note muted small">HSK 3.0 có 9 cấp; HSK 1 cần 300 từ. <a href="gioi-thieu.html">Tìm hiểu thêm</a></p>';
+      '<p class="home-note muted small">Chuẩn HSK 3.0: HSK 1 (300 từ) · HSK 2 (200 từ). <a href="gioi-thieu.html">Tìm hiểu thêm</a></p>';
   }
 
   /* ================= từ điển ================= */
@@ -741,6 +781,16 @@
     dictQuery = e.target.value;
     renderDictList();
   });
+  var lvlSwitch = $("#level-switch");
+  if (lvlSwitch) {
+    lvlSwitch.addEventListener("click", function (e) {
+      var btn = e.target.closest(".level-pill");
+      if (btn && btn.dataset.lvl) {
+        setLevel(btn.dataset.lvl);
+        render();
+      }
+    });
+  }
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       if (!$("#writeSheet").classList.contains("hidden")) closeWriter();

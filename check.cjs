@@ -12,8 +12,10 @@ function t(name, fn) {
   catch (e) { console.error("FAIL " + name + "\n     " + e.message); process.exitCode = 1; }
 }
 
-/* ---------- Dữ liệu ---------- */
-t("300 từ, đúng 4 trường, không trùng", () => {
+const HSK2 = require("./data.js").HSK2;
+
+/* ---------- Dữ liệu HSK 1 ---------- */
+t("300 từ HSK 1, đúng 4 trường, không trùng", () => {
   assert.strictEqual(HSK1.length, 300);
   const seen = new Set();
   for (const row of HSK1) {
@@ -24,13 +26,39 @@ t("300 từ, đúng 4 trường, không trùng", () => {
   }
 });
 
-t("pinyin chỉ chứa âm tiết Latinh + dấu thanh", () => {
+t("pinyin HSK 1 chỉ chứa âm tiết Latinh + dấu thanh", () => {
   const neutralOnly = new Set(["吧", "的", "了", "吗", "呢", "们"]); // từ chỉ có thanh nhẹ
   for (const [h, p] of HSK1) {
     assert.ok(/^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüńňǹr ]+$/i.test(p), "pinyin lạ: " + h + " " + p);
     const tones = Core.syllables(p).map(Core.toneOf);
     assert.ok(tones.every(n => n >= 0 && n <= 4), "thanh lạ: " + h + " " + p);
     if (!neutralOnly.has(h)) assert.ok(tones.some(n => n > 0), "thiếu dấu thanh: " + h + " " + p);
+    else assert.ok(tones.every(n => n === 0), "phải là thanh nhẹ: " + h + " " + p);
+  }
+});
+
+/* ---------- Dữ liệu HSK 2 ---------- */
+t("200 từ HSK 2, đúng 4 trường, không trùng lặp và không trùng HSK 1", () => {
+  assert.ok(Array.isArray(HSK2), "HSK 2 phải là mảng");
+  assert.strictEqual(HSK2.length, 200, "HSK 2 phải có đúng 200 từ");
+  const hsk1Set = new Set(HSK1.map(x => x[0]));
+  const seen2 = new Set();
+  for (const row of HSK2) {
+    assert.strictEqual(row.length, 4, "row HSK 2: " + JSON.stringify(row));
+    for (const v of row) assert.ok(String(v).trim().length > 0, "rỗng: " + JSON.stringify(row));
+    assert.ok(!seen2.has(row[0]), "trùng trong HSK 2: " + row[0]);
+    assert.ok(!hsk1Set.has(row[0]), "trùng với HSK 1: " + row[0]);
+    seen2.add(row[0]);
+  }
+});
+
+t("pinyin HSK 2 hợp lệ âm tiết Latinh + dấu thanh", () => {
+  const neutralOnly2 = new Set(["啊", "地", "过"]);
+  for (const [h, p] of HSK2) {
+    assert.ok(/^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüńňǹr ]+$/i.test(p), "pinyin lạ: " + h + " " + p);
+    const tones = Core.syllables(p).map(Core.toneOf);
+    assert.ok(tones.every(n => n >= 0 && n <= 4), "thanh lạ: " + h + " " + p);
+    if (!neutralOnly2.has(h)) assert.ok(tones.some(n => n > 0), "thiếu dấu thanh: " + h + " " + p);
     else assert.ok(tones.every(n => n === 0), "phải là thanh nhẹ: " + h + " " + p);
   }
 });
