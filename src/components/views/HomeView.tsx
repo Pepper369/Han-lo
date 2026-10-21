@@ -277,6 +277,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <h4>214 Bộ Thủ &amp; Chiết Tự</h4>
             <p>214 bộ Khang Hy, phân rã chữ &amp; mẹo nhớ hình ảnh.</p>
           </div>
+          <div className="bento-card" onClick={() => onNavigate('worksheet')}>
+            <span className="bento-icon">📄</span>
+            <h4>Tạo Đề &amp; In Phiếu A4</h4>
+            <p>Phiếu viết ô Mễ (米字格) &amp; đề thi trắc nghiệm in ấn.</p>
+          </div>
+          <div className="bento-card" onClick={() => onNavigate('talk')}>
+            <span className="bento-icon">💬</span>
+            <h4>Phòng Giao Tiếp AI</h4>
+            <p>Hội thoại thực chiến nhập vai &amp; AI chấm điểm giọng nói.</p>
+          </div>
           <div className="bento-card" onClick={() => onNavigate('exam')}>
             <span className="bento-icon">📝</span>
             <h4>Thi Thử HSK 1 &amp; 2</h4>

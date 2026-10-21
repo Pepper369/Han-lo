@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type NavTab = 'home' | 'exam' | 'dict' | 'write' | 'progress' | 'phonics' | 'grammar' | 'reader' | 'speech' | 'dictation' | 'radicals';
+export type NavTab = 'home' | 'exam' | 'dict' | 'write' | 'progress' | 'phonics' | 'grammar' | 'reader' | 'speech' | 'dictation' | 'radicals' | 'worksheet' | 'talk';
 
 interface TabBarProps {
   currentTab: NavTab;
@@ -15,7 +15,9 @@ export const TabBar: React.FC<TabBarProps> = ({ currentTab, onSelectTab }) => {
     currentTab === 'reader' ||
     currentTab === 'speech' ||
     currentTab === 'dictation' ||
-    currentTab === 'radicals';
+    currentTab === 'radicals' ||
+    currentTab === 'worksheet' ||
+    currentTab === 'talk';
 
   return (
     <nav className="tabbar" aria-label="Điều hướng chính">

@@ -26,6 +26,8 @@ import { ReaderView } from './components/views/ReaderView';
 import { SpeechView } from './components/views/SpeechView';
 import { DictationView } from './components/views/DictationView';
 import { RadicalsView } from './components/views/RadicalsView';
+import { WorksheetView } from './components/views/WorksheetView';
+import { DialogueView } from './components/views/DialogueView';
 import { StudySessionModal } from './components/modals/StudySessionModal';
 import { ExamModal } from './components/modals/ExamModal';
 import { LookupModal } from './components/modals/LookupModal';
@@ -41,7 +43,7 @@ export const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(() => todayFresh(loadState()));
   const [currentTab, setCurrentTab] = useState<NavTab>(() => {
     const hash = (window.location.hash || '').replace('#', '') as NavTab;
-    const validTabs: NavTab[] = ['home', 'exam', 'dict', 'write', 'progress', 'phonics', 'grammar', 'reader', 'speech', 'dictation', 'radicals'];
+    const validTabs: NavTab[] = ['home', 'exam', 'dict', 'write', 'progress', 'phonics', 'grammar', 'reader', 'speech', 'dictation', 'radicals', 'worksheet', 'talk'];
     return validTabs.includes(hash) ? hash : 'home';
   });
 
@@ -315,6 +317,18 @@ export const App: React.FC = () => {
         <RadicalsView
           audioEnabled={appState.settings.audio}
           onOpenWriter={(ch) => setWriteChar(ch)}
+        />
+      )}
+
+      {currentTab === 'worksheet' && (
+        <WorksheetView
+          audioEnabled={appState.settings.audio}
+        />
+      )}
+
+      {currentTab === 'talk' && (
+        <DialogueView
+          audioEnabled={appState.settings.audio}
         />
       )}
 

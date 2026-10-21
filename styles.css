@@ -1540,4 +1540,53 @@ a { color: var(--blue); }
   color: var(--muted);
 }
 
+/* ---------- PRINTABLE WORKSHEETS & EXAM PRINT STYLES ---------- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .no-print,
+  .tabbar,
+  .topbar,
+  .toast,
+  .sheet,
+  nav {
+    display: none !important;
+  }
+
+  .view,
+  .worksheet-container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .printable-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .mizige-row {
+    page-break-inside: avoid;
+  }
+
+  .worksheet-word-block {
+    page-break-inside: avoid;
+  }
+
+  .exam-questions-list > div {
+    page-break-inside: avoid;
+  }
+}
+
+
 
