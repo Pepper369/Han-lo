@@ -225,114 +225,116 @@ export const App: React.FC = () => {
         onOpenSettings={() => setShowSettings(true)}
       />
 
-      {/* Main Views */}
-      {currentTab === 'home' && (
-        <HomeView
-          currentLvl={currentLvl}
-          words={currentLevelWords}
-          allWords={ALL_WORDS}
-          cards={appState.cards}
-          dailyNew={appState.daily.new}
-          goal={appState.settings.goal}
-          onStartLearn={handleStartLearn}
-          onStartReview={handleStartReview}
-          onNavigate={navigateTab}
-          onSelectLevel={handleSelectLevel}
-        />
-      )}
+      {/* Main Views — wrapped in <main class="view"> for desktop grid-column: 2 */}
+      <main className="view">
+        {currentTab === 'home' && (
+          <HomeView
+            currentLvl={currentLvl}
+            words={currentLevelWords}
+            allWords={ALL_WORDS}
+            cards={appState.cards}
+            dailyNew={appState.daily.new}
+            goal={appState.settings.goal}
+            onStartLearn={handleStartLearn}
+            onStartReview={handleStartReview}
+            onNavigate={navigateTab}
+            onSelectLevel={handleSelectLevel}
+          />
+        )}
 
-      {currentTab === 'exam' && (
-        <ExamView
-          examHistory={appState.examHistory}
-          onStartExam={handleStartExam}
-        />
-      )}
+        {currentTab === 'exam' && (
+          <ExamView
+            examHistory={appState.examHistory}
+            onStartExam={handleStartExam}
+          />
+        )}
 
-      {currentTab === 'dict' && (
-        <DictView
-          words={currentLevelWords}
-          cards={appState.cards}
-          showPinyin={appState.settings.pinyin}
-          audioEnabled={appState.settings.audio}
-          onOpenLookup={(w) => setLookupData(w)}
-        />
-      )}
+        {currentTab === 'dict' && (
+          <DictView
+            words={currentLevelWords}
+            cards={appState.cards}
+            showPinyin={appState.settings.pinyin}
+            audioEnabled={appState.settings.audio}
+            onOpenLookup={(w) => setLookupData(w)}
+          />
+        )}
 
-      {currentTab === 'write' && (
-        <WriteView
-          words={currentLevelWords}
-          cards={appState.cards}
-          onOpenWriter={(ch) => setWriteChar(ch)}
-        />
-      )}
+        {currentTab === 'write' && (
+          <WriteView
+            words={currentLevelWords}
+            cards={appState.cards}
+            onOpenWriter={(ch) => setWriteChar(ch)}
+          />
+        )}
 
-      {currentTab === 'progress' && (
-        <ProgressView
-          words={currentLevelWords}
-          cards={appState.cards}
-          history={appState.history}
-          examHistory={appState.examHistory}
-          streakCount={appState.streak.count}
-          onExportBackup={() => {
-            exportBackup(appState);
-            showToast('Đã xuất file sao lưu tiến độ!');
-          }}
-          onImportBackup={() => setShowSettings(true)}
-        />
-      )}
+        {currentTab === 'progress' && (
+          <ProgressView
+            words={currentLevelWords}
+            cards={appState.cards}
+            history={appState.history}
+            examHistory={appState.examHistory}
+            streakCount={appState.streak.count}
+            onExportBackup={() => {
+              exportBackup(appState);
+              showToast('Đã xuất file sao lưu tiến độ!');
+            }}
+            onImportBackup={() => setShowSettings(true)}
+          />
+        )}
 
-      {currentTab === 'phonics' && (
-        <PhonicsView
-          audioEnabled={appState.settings.audio}
-          onOpenWriter={(ch) => setWriteChar(ch)}
-        />
-      )}
+        {currentTab === 'phonics' && (
+          <PhonicsView
+            audioEnabled={appState.settings.audio}
+            onOpenWriter={(ch) => setWriteChar(ch)}
+          />
+        )}
 
-      {currentTab === 'grammar' && (
-        <GrammarView audioEnabled={appState.settings.audio} />
-      )}
+        {currentTab === 'grammar' && (
+          <GrammarView audioEnabled={appState.settings.audio} />
+        )}
 
-      {currentTab === 'reader' && (
-        <ReaderView
-          audioEnabled={appState.settings.audio}
-          onOpenLookupToken={(tok) => setLookupData(tok)}
-        />
-      )}
+        {currentTab === 'reader' && (
+          <ReaderView
+            audioEnabled={appState.settings.audio}
+            onOpenLookupToken={(tok) => setLookupData(tok)}
+          />
+        )}
 
-      {currentTab === 'speech' && (
-        <SpeechView
-          words={currentLevelWords}
-          allWords={ALL_WORDS}
-          audioEnabled={appState.settings.audio}
-        />
-      )}
+        {currentTab === 'speech' && (
+          <SpeechView
+            words={currentLevelWords}
+            allWords={ALL_WORDS}
+            audioEnabled={appState.settings.audio}
+          />
+        )}
 
-      {currentTab === 'dictation' && (
-        <DictationView
-          audioEnabled={appState.settings.audio}
-        />
-      )}
+        {currentTab === 'dictation' && (
+          <DictationView
+            audioEnabled={appState.settings.audio}
+          />
+        )}
 
-      {currentTab === 'radicals' && (
-        <RadicalsView
-          audioEnabled={appState.settings.audio}
-          onOpenWriter={(ch) => setWriteChar(ch)}
-        />
-      )}
+        {currentTab === 'radicals' && (
+          <RadicalsView
+            audioEnabled={appState.settings.audio}
+            onOpenWriter={(ch) => setWriteChar(ch)}
+          />
+        )}
 
-      {currentTab === 'worksheet' && (
-        <WorksheetView
-          audioEnabled={appState.settings.audio}
-        />
-      )}
+        {currentTab === 'worksheet' && (
+          <WorksheetView
+            audioEnabled={appState.settings.audio}
+          />
+        )}
 
-      {currentTab === 'talk' && (
-        <DialogueView
-          audioEnabled={appState.settings.audio}
-        />
-      )}
+        {currentTab === 'talk' && (
+          <DialogueView
+            audioEnabled={appState.settings.audio}
+          />
+        )}
+      </main>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation (mobile) / Sidebar (desktop via CSS) */}
       <TabBar currentTab={currentTab} onSelectTab={navigateTab} />
 
       {/* Active Study Session Modal */}

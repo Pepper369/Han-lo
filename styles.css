@@ -1540,7 +1540,312 @@ a { color: var(--blue); }
   color: var(--muted);
 }
 
-/* ---------- PRINTABLE WORKSHEETS & EXAM PRINT STYLES ---------- */
+/* =====================================================
+   RESPONSIVE SYSTEM — Mobile ↔ Tablet ↔ Desktop
+   Breakpoints: 480 · 640 · 768 · 1024 · 1280
+   ===================================================== */
+
+/* --- Base: mobile-first adjustments ≤480px --- */
+@media (max-width: 480px) {
+  body { font-size: 14px; }
+
+  .app { padding: 0 12px 96px; }
+
+  /* TopBar: compact on small phones */
+  .topbar { padding: 8px 0 8px; gap: 8px; }
+  .brand-mark { width: 34px; height: 34px; font-size: 19px; border-radius: 10px; }
+  .brand-text h1 { font-size: 15px; }
+  .brand-text p { display: none; }
+  .streak { padding: 5px 8px; font-size: 12px; }
+  .icon-btn { width: 34px; height: 34px; border-radius: 10px; }
+
+  /* Cards: tighter padding */
+  .card { padding: 14px 14px; border-radius: 16px; }
+  .card h2 { font-size: 18px; margin-bottom: 10px; }
+  .card h3 { font-size: 14px; }
+
+  /* Buttons: full min touch target, smaller font */
+  .btn { min-height: 44px; padding: 10px 14px; font-size: 14px; border-radius: 12px; }
+  .btn.small { min-height: 34px; padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+  /* Input fields */
+  .input { padding: 10px 12px; font-size: 14px; }
+
+  /* Bento grid: 2 col on phones, shrink font */
+  .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .bento-card { padding: 12px 10px; border-radius: 12px; }
+  .bento-card h4 { font-size: 12.5px; }
+  .bento-card p { font-size: 10.5px; }
+  .bento-icon { font-size: 20px; margin-bottom: 6px; }
+
+  /* TabBar: tinier labels */
+  .tab { padding: 5px 2px; font-size: 10px; }
+  .tabbar { gap: 2px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); }
+
+  /* Lessons grid: 5 cols on phones */
+  .lessons { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .lesson { font-size: 12px; border-radius: 10px; }
+
+  /* Zero-lesson list */
+  .zero-lesson-item { padding: 10px 12px; border-radius: 12px; }
+  .zli-icon { width: 32px; height: 32px; font-size: 17px; border-radius: 8px; }
+  .zli-text h4 { font-size: 13px; }
+  .zli-text p { font-size: 11px; }
+
+  /* Hero card */
+  .hero { padding: 16px 14px; }
+  .hero-actions { gap: 8px; }
+
+  /* Mascot box */
+  .mascot-avatar { width: 40px; height: 40px; }
+  .mascot-bubble { font-size: 12.5px; }
+
+  /* Hanzi display in study */
+  .hanzi { font-size: clamp(52px, 22vw, 76px); }
+}
+
+/* --- Tablet: 481–767px --- */
+@media (min-width: 481px) and (max-width: 767px) {
+  .app { padding: 0 16px 100px; }
+  .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .lessons { grid-template-columns: repeat(7, 1fr); }
+}
+
+/* --- Desktop: 768px+ — main layout expands --- */
+@media (min-width: 768px) {
+  body { font-size: 15px; }
+
+  /* Widen the main container */
+  .app {
+    max-width: 980px;
+    padding: 0 28px 40px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: auto 1fr;
+    column-gap: 28px;
+    align-items: start;
+  }
+
+  /* TopBar spans full width */
+  .topbar {
+    grid-column: 1 / -1;
+    position: sticky;
+    top: 0;
+    padding: 14px 0 12px;
+  }
+
+  /* Sidebar TabBar on desktop */
+  .tabbar {
+    position: sticky;
+    top: 76px;
+    left: 0;
+    bottom: auto;
+    right: auto;
+    width: 220px;
+    height: auto;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 10px;
+    border-top: none;
+    border-right: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--card);
+    backdrop-filter: none;
+    align-self: start;
+    box-shadow: var(--shadow);
+    grid-row: 2;
+    grid-column: 1;
+    z-index: 5;
+  }
+
+  .tab {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    border-radius: 12px;
+    width: 100%;
+    text-align: left;
+  }
+  .tab svg { flex-shrink: 0; }
+  .tab.active { background: var(--jade-soft); color: var(--jade); }
+
+  /* Content area on the right */
+  .app > .view,
+  .app > section,
+  .app > main {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  /* Bento grid: 3 cols on desktop */
+  .bento-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  /* Lessons: more columns */
+  .lessons { grid-template-columns: repeat(10, 1fr); gap: 8px; }
+  .stat-grid { grid-template-columns: repeat(4, 1fr); }
+  .matrix-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Tone grid and nuance: 2 col */
+  .tone-grid { grid-template-columns: repeat(2, 1fr); }
+  .nuance-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Basic strokes: 4 cols */
+  .basic-strokes-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Sheets and dialogs center properly */
+  .sheet-card { max-width: 560px; }
+
+  /* Toast: higher up to avoid sidebar */
+  .toast { bottom: 24px; }
+
+  /* Dict word row grid: wider */
+  .word-row { padding: 12px 16px; }
+  .w-hz { font-size: 26px; }
+}
+
+/* --- Wide desktop: 1024px+ --- */
+@media (min-width: 1024px) {
+  .app {
+    max-width: 1200px;
+    grid-template-columns: 240px 1fr;
+    column-gap: 32px;
+    padding: 0 40px 40px;
+  }
+
+  .tabbar { width: 240px; }
+
+  .bento-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* --- Small button responsive fix (ensure ≥ 34px on all sizes) --- */
+.btn.small {
+  min-height: 34px;
+  padding: 5px 10px;
+  font-size: 12.5px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* --- Input field base --- */
+.input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 14px;
+  background: var(--card);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s;
+}
+.input:focus { border-color: var(--jade); }
+
+/* --- View container (new Package views) --- */
+.view {
+  padding-bottom: 24px;
+  min-height: 60vh;
+}
+
+/* On mobile, new views use full width */
+@media (max-width: 767px) {
+  /* Remove inline max-width on new views — let container handle it */
+  .view > .card { margin-left: 0; margin-right: 0; }
+  
+  /* DictationView live diff tokens: smaller on mobile */
+  .diff-token { min-width: 36px !important; padding: 4px 6px !important; }
+  .diff-token span:first-child { font-size: 22px !important; }
+
+  /* RadicalsView grid: 1 col cards on mobile */
+  .radicals-grid { grid-template-columns: 1fr !important; }
+
+  /* WorksheetView: hide some columns on small screen */
+  .worksheet-word-block { font-size: 12px; }
+  .mizige-row { height: 44px; }
+  .mizige-cell { width: 44px !important; height: 44px !important; }
+
+  /* DialogueView: chat bubbles full width */
+  .dialogue-bubble { max-width: 95% !important; }
+
+  /* Toolbar button groups: wrap */
+  .toolbar-group { flex-wrap: wrap; }
+}
+
+/* --- Special: on desktop, sidebar tabs show labels without truncation --- */
+@media (min-width: 768px) {
+  .tab span { display: block; font-size: 13px; font-weight: 500; }
+}
+
+/* --- Fix: hero-actions on PC should be row not column --- */
+@media (min-width: 640px) {
+  .hero-actions { display: flex; flex-direction: row; gap: 10px; }
+  .hero-actions .btn { flex: 1; }
+}
+
+/* --- Fix: sheet modals on large screens --- */
+@media (min-width: 768px) {
+  .sheet.center-sheet { padding: 32px; }
+  .sheet-card { border-radius: 24px; padding: 28px; }
+  .sheet-card.write-card { max-width: 480px; }
+}
+
+/* --- Roadmap: responsive grid --- */
+@media (max-width: 480px) {
+  .roadmap-track { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .roadmap-step-title { font-size: 11px; }
+  .roadmap-step-desc { font-size: 9.5px; }
+}
+
+/* --- Char grid: responsive --- */
+@media (max-width: 400px) {
+  .char-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .char-btn { font-size: 22px; }
+}
+@media (min-width: 640px) {
+  .char-grid { grid-template-columns: repeat(8, 1fr); }
+}
+@media (min-width: 1024px) {
+  .char-grid { grid-template-columns: repeat(10, 1fr); }
+}
+
+/* --- Exam: wider content area on PC --- */
+@media (min-width: 768px) {
+  .exam-container { max-width: 720px; padding: 24px 24px 60px; }
+  .exam-topbar { padding: 14px 24px; }
+  .judge-opts { gap: 16px; }
+}
+
+/* --- Progress page stats --- */
+@media (max-width: 480px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat b { font-size: 21px; }
+}
+
+/* --- Responsive image/video placeholder --- */
+/* --- Desktop: sidebar TabBar grid placement --- */
+@media (min-width: 768px) {
+  /* TabBar becomes left sidebar */
+  .app > .tabbar {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  /* Main content area */
+  .app > main.view {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  /* TopBar full width */
+  .app > .topbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+
+
 @media print {
   @page {
     size: A4 portrait;
