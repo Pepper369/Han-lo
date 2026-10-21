@@ -24,6 +24,8 @@ import { PhonicsView } from './components/views/PhonicsView';
 import { GrammarView } from './components/views/GrammarView';
 import { ReaderView } from './components/views/ReaderView';
 import { SpeechView } from './components/views/SpeechView';
+import { DictationView } from './components/views/DictationView';
+import { RadicalsView } from './components/views/RadicalsView';
 import { StudySessionModal } from './components/modals/StudySessionModal';
 import { ExamModal } from './components/modals/ExamModal';
 import { LookupModal } from './components/modals/LookupModal';
@@ -39,7 +41,7 @@ export const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(() => todayFresh(loadState()));
   const [currentTab, setCurrentTab] = useState<NavTab>(() => {
     const hash = (window.location.hash || '').replace('#', '') as NavTab;
-    const validTabs: NavTab[] = ['home', 'exam', 'dict', 'write', 'progress', 'phonics', 'grammar', 'reader', 'speech'];
+    const validTabs: NavTab[] = ['home', 'exam', 'dict', 'write', 'progress', 'phonics', 'grammar', 'reader', 'speech', 'dictation', 'radicals'];
     return validTabs.includes(hash) ? hash : 'home';
   });
 
@@ -300,6 +302,19 @@ export const App: React.FC = () => {
           words={currentLevelWords}
           allWords={ALL_WORDS}
           audioEnabled={appState.settings.audio}
+        />
+      )}
+
+      {currentTab === 'dictation' && (
+        <DictationView
+          audioEnabled={appState.settings.audio}
+        />
+      )}
+
+      {currentTab === 'radicals' && (
+        <RadicalsView
+          audioEnabled={appState.settings.audio}
+          onOpenWriter={(ch) => setWriteChar(ch)}
         />
       )}
 

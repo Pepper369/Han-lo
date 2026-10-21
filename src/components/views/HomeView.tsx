@@ -148,6 +148,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
               <span className="badge s-learning">Luyện nói →</span>
             </div>
+
+            <div className="zero-lesson-item" onClick={() => onNavigate('radicals')}>
+              <div className="zli-left">
+                <span className="zli-icon">🧩</span>
+                <div className="zli-text">
+                  <h4>7. 214 Bộ Thủ Khang Hy &amp; Chiết Tự</h4>
+                  <p>Gốc rễ cấu tạo chữ Hán, mẹo nhớ hình tượng qua bộ thủ</p>
+                </div>
+              </div>
+              <span className="badge s-mastered">Khám phá →</span>
+            </div>
+
+            <div className="zero-lesson-item" onClick={() => onNavigate('dictation')}>
+              <div className="zli-left">
+                <span className="zli-icon">🎧</span>
+                <div className="zli-text">
+                  <h4>8. Nghe Chép Chính Tả (Dictation)</h4>
+                  <p>Luyện tai phản xạ nghe câu tiếng Trung chuẩn xác từng âm</p>
+                </div>
+              </div>
+              <span className="badge s-learning">Luyện nghe →</span>
+            </div>
           </div>
 
           <div style={{ marginTop: 16 }}>
@@ -244,6 +266,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <span className="bento-icon">⚖️</span>
             <h4>Sắc Thái &amp; Ngữ Pháp</h4>
             <p>So sánh 二/两, 会/能/可以, 的/得/地...</p>
+          </div>
+          <div className="bento-card" onClick={() => onNavigate('dictation')}>
+            <span className="bento-icon">🎧</span>
+            <h4>Nghe Chép Chính Tả</h4>
+            <p>Luyện tai nghe, gõ chữ Hán/Pinyin với âm thanh 1.0x &amp; 0.7x.</p>
+          </div>
+          <div className="bento-card" onClick={() => onNavigate('radicals')}>
+            <span className="bento-icon">🧩</span>
+            <h4>214 Bộ Thủ &amp; Chiết Tự</h4>
+            <p>214 bộ Khang Hy, phân rã chữ &amp; mẹo nhớ hình ảnh.</p>
           </div>
           <div className="bento-card" onClick={() => onNavigate('exam')}>
             <span className="bento-icon">📝</span>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Word, ReaderToken } from '../../types';
 import { speak } from '../../utils/tts';
 import { renderPinyinElements } from '../views/DictView';
+import { getDecomposition } from '../../data/radicals';
 
 interface LookupModalProps {
   data: Word | ReaderToken;
@@ -20,6 +21,8 @@ export const LookupModal: React.FC<LookupModalProps> = ({
   const pinyin = data.p || '';
   const hv = data.hv || '';
   const vi = data.vi || '';
+
+  const decomp = getDecomposition(hanzi);
 
   return (
     <div
@@ -54,9 +57,29 @@ export const LookupModal: React.FC<LookupModalProps> = ({
             </p>
           )}
           {vi && (
-            <p className="meaning" style={{ fontSize: 16, color: 'var(--ink)', margin: '6px 0 16px' }}>
+            <p className="meaning" style={{ fontSize: 16, color: 'var(--ink)', margin: '6px 0 12px' }}>
               {vi}
             </p>
+          )}
+
+          {decomp && (
+            <div
+              style={{
+                margin: '10px 0 14px',
+                padding: '10px 12px',
+                backgroundColor: 'rgba(47, 111, 94, 0.08)',
+                borderRadius: 8,
+                border: '1px solid rgba(47, 111, 94, 0.2)',
+                textAlign: 'left'
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#2f6f5e', marginBottom: 2 }}>
+                🧩 Chiết tự: {decomp.parts.join(' + ')} = {decomp.char}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.4 }}>
+                💡 <i>{decomp.story}</i>
+              </div>
+            </div>
           )}
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>

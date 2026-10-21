@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type NavTab = 'home' | 'exam' | 'dict' | 'write' | 'progress' | 'phonics' | 'grammar' | 'reader' | 'speech';
+export type NavTab = 'home' | 'exam' | 'dict' | 'write' | 'progress' | 'phonics' | 'grammar' | 'reader' | 'speech' | 'dictation' | 'radicals';
 
 interface TabBarProps {
   currentTab: NavTab;
@@ -8,10 +8,19 @@ interface TabBarProps {
 }
 
 export const TabBar: React.FC<TabBarProps> = ({ currentTab, onSelectTab }) => {
+  const isLearnActive =
+    currentTab === 'home' ||
+    currentTab === 'phonics' ||
+    currentTab === 'grammar' ||
+    currentTab === 'reader' ||
+    currentTab === 'speech' ||
+    currentTab === 'dictation' ||
+    currentTab === 'radicals';
+
   return (
     <nav className="tabbar" aria-label="Điều hướng chính">
       <button
-        className={`tab ${currentTab === 'home' || currentTab === 'phonics' || currentTab === 'grammar' || currentTab === 'reader' || currentTab === 'speech' ? 'active' : ''}`}
+        className={`tab ${isLearnActive ? 'active' : ''}`}
         onClick={() => onSelectTab('home')}
       >
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
